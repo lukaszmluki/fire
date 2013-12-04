@@ -1,0 +1,4 @@
+/contrib/*
+!/contrib/update.sh
+/external/lib/*
+/external/include/*
