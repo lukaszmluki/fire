@@ -1,3 +1,7 @@
+/fire
+Makefile
+/moc/
+/obj/
 /contrib/*
 !/contrib/update.sh
 /external/lib/*
