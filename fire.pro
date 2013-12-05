@@ -2,7 +2,17 @@
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 
-SOURCES += src/main.cpp \
-           src/openglwindow.cpp
+QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
 
-HEADERS += src/openglwindow.h
+INCLUDEPATH += ./external/include/
+
+LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --libs libavdevice libavutil libavcodec libavfilter libavengine`
+
+SOURCES += src/main.cpp \
+           src/openglwindow.cpp \
+           src/ffengine.cpp \
+           src/systemdelegates.cpp
+
+HEADERS += src/openglwindow.h \
+           src/ffengine.h \
+           src/systemdelegates.h

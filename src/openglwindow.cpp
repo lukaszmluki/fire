@@ -1,10 +1,18 @@
+/*
+ * File:   openglwindow.cpp
+ * Author: Lukasz Marek
+ *
+ * Created on December 5, 2013, 3:42 PM
+ */
+
 #include "openglwindow.h"
-
 #include <QtCore/QCoreApplication>
-
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
+
+#include "ffengine.h"
+FFEngine engine;
 
 OpenGLWindow::OpenGLWindow(QWindow *parent)
     : QWindow(parent)
@@ -12,6 +20,7 @@ OpenGLWindow::OpenGLWindow(QWindow *parent)
     , m_device(0)
 {
     setSurfaceType(QWindow::OpenGLSurface);
+    engine.open("/home/lmr/Pobrane/channelcheck-large.mp4");
 }
 
 OpenGLWindow::~OpenGLWindow()

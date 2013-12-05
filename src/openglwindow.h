@@ -1,3 +1,13 @@
+/*
+ * File:   openglwindow.h
+ * Author: Lukasz Marek
+ *
+ * Created on December 5, 2013, 3:42 PM
+ */
+
+#ifndef SRC_OPENGL_WINDOW_H
+#define SRC_OPENGL_WINDOW_H
+
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
 
@@ -35,3 +45,4 @@ private:
     QOpenGLPaintDevice *m_device;
 };
 
+#endif /* SRC_OPENGL_WINDOW_H */
