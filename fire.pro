@@ -11,8 +11,10 @@ LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --l
 SOURCES += src/main.cpp \
            src/openglwindow.cpp \
            src/ffengine.cpp \
-           src/systemdelegates.cpp
+           src/systemdelegates.cpp \
+           src/preferences.cpp
 
 HEADERS += src/openglwindow.h \
            src/ffengine.h \
-           src/systemdelegates.h
+           src/systemdelegates.h \
+           src/preferences.h

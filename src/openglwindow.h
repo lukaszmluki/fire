@@ -8,41 +8,39 @@
 #ifndef SRC_OPENGL_WINDOW_H
 #define SRC_OPENGL_WINDOW_H
 
-#include <QtGui/QWindow>
-#include <QtGui/QOpenGLFunctions>
+#include <QWindow>
 
-class QPainter;
+class FFEngine;
 class QOpenGLContext;
-class QOpenGLPaintDevice;
+class QTimer;
 
-class OpenGLWindow : public QWindow, protected QOpenGLFunctions
+class OpenGLWindow : public QWindow
 {
     Q_OBJECT
 public:
     explicit OpenGLWindow(QWindow *parent = 0);
     virtual ~OpenGLWindow();
 
-    virtual void render(QPainter *painter);
-    virtual void render();
-
-    virtual void initialize();
-
-    void setAnimating(bool animating);
-
 public slots:
-    void renderNow();
+    void toggleFullscreen();
+    //for OpenGL
+    void swapBuffer();
+    void makeContextCurrent();
+    void getWindowSize(int *width, int *height);
+
+private slots:
+    void hideCursor();
+    void showCursor();
 
 protected:
-    bool event(QEvent *event);
-
-    void exposeEvent(QExposeEvent *event);
-    void resizeEvent(QResizeEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void mouseMoveEvent(QMouseEvent * event);
 
 private:
-    bool m_update_pending;
-
     QOpenGLContext *m_context;
-    QOpenGLPaintDevice *m_device;
+    FFEngine *m_engine;
+    QTimer *m_cursorHideTimer;
 };
 
 #endif /* SRC_OPENGL_WINDOW_H */

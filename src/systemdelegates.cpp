@@ -5,9 +5,9 @@
  * Created on December 5, 2013, 3:57 PM
  */
 
-#include <QtCore/QThread>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
 #include "systemdelegates.h"
 
 namespace {
