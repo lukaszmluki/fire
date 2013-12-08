@@ -11,6 +11,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QFont>
+#include <QString>
 
 class QVariant;
 class QString;
@@ -37,6 +38,8 @@ public:
     void setLastDir(const QString &dir);
     void setViewMode(ViewMode viewMode);
     ViewMode getViewMode() const;
+    void setSelectedFile(const QString &file);
+    const QString& getSelectedFile() const;
     QFont getDefaultFontEditor() const;
 private:
     void createDefaultConfig();
@@ -44,6 +47,7 @@ private:
     QSettings *m_settings;
     QFont m_defaultFontEditor;
     ViewMode m_viewMode;
+    QString m_selectedFile;
 
 signals:
     void applySettings();

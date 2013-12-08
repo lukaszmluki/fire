@@ -2,6 +2,8 @@
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 
+CONFIG+=debug
+
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
 
 INCLUDEPATH += ./external/include/

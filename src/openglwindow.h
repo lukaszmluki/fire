@@ -29,6 +29,7 @@ public slots:
     void getWindowSize(int *width, int *height);
 
 private slots:
+    void openSelectedFile();
     void hideCursor();
     void showCursor();
 

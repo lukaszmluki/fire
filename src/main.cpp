@@ -5,8 +5,10 @@
  * Created on December 5, 2013, 3:42 PM
  */
 
-#include <QString>
 #include <QGuiApplication>
+#include <QString>
+#include <QFile>
+#include <QDebug>
 #include "openglwindow.h"
 #include "preferences.h"
 
@@ -18,10 +20,21 @@ void parseArgs(int argc, char **argv)
     //set defaults
     Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
     //scan params
-    for (int i = 0; i < argc; i++) {
-        QString param(argv[i]);
-        if (param == PARAM_WINDOWED)
-            Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
+    QStringList params;
+    for (int i = 1; i < argc; i++)
+        params << argv[i];
+
+    if (params.removeAll(PARAM_WINDOWED))
+        Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
+
+    Q_FOREACH(QString param, params) {
+        if (QFile::exists(param)) {
+            Preferences::instance().setSelectedFile(param);
+            params.removeOne(param);
+        }
+    }
+    Q_FOREACH(QString param, params) {
+        qWarning() << "Unrecognized option:" << param;
     }
 }
 }

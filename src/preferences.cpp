@@ -58,6 +58,16 @@ Preferences::ViewMode Preferences::getViewMode() const
     return m_viewMode;
 }
 
+void Preferences::setSelectedFile(const QString &file)
+{
+    m_selectedFile = file;
+}
+
+const QString& Preferences::getSelectedFile() const
+{
+    return m_selectedFile;
+}
+
 void Preferences::createDefaultConfig()
 {
     setValue("editor/encoding", "default");

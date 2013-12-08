@@ -12,9 +12,8 @@
 #include <QKeyEvent>
 #include <QDebug>
 #include <QOpenGLContext>
-#include <QOpenGLPaintDevice>
-#include <QPainter>
 #include <QCoreApplication>
+#include <QTimer>
 #include "ffengine.h"
 #include "preferences.h"
 
@@ -25,7 +24,7 @@ OpenGLWindow::OpenGLWindow(QWindow *parent) :
     m_cursorHideTimer(new QTimer(this))
 {
     setSurfaceType(QWindow::OpenGLSurface);
-    
+
     QObject::connect(m_engine, SIGNAL(beforeWriteHeader()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
     QObject::connect(m_engine, SIGNAL(beforeWritePacket()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
     QObject::connect(m_engine, SIGNAL(beforeWriteTrailer()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
@@ -33,12 +32,12 @@ OpenGLWindow::OpenGLWindow(QWindow *parent) :
     QObject::connect(m_engine, SIGNAL(afterWriteHeader()), this, SLOT(swapBuffer()), Qt::DirectConnection);
     QObject::connect(m_engine, SIGNAL(afterWritePacket()), this, SLOT(swapBuffer()), Qt::DirectConnection);
     QObject::connect(m_engine, SIGNAL(afterWriteTrailer()), this, SLOT(swapBuffer()), Qt::DirectConnection);
-    
+
     QObject::connect(m_engine, SIGNAL(getWindowSize(int *, int *)), this, SLOT(getWindowSize(int *, int *)), Qt::DirectConnection);
-    
+
     QObject::connect(m_cursorHideTimer, SIGNAL(timeout()), this, SLOT(hideCursor()));
 
-    m_engine->open("/home/lmr/24.Redemption.2008.EXTENDED.DVDRip.XviD-SAiNTS.avi");
+    QTimer::singleShot(0, this, SLOT(openSelectedFile()));
 }
 
 OpenGLWindow::~OpenGLWindow()
@@ -81,6 +80,11 @@ void OpenGLWindow::getWindowSize(int *width, int *height)
     *height = QWindow::height();
 }
 
+void OpenGLWindow::openSelectedFile()
+{
+    m_engine->open(Preferences::instance().getSelectedFile());
+}
+
 void OpenGLWindow::hideCursor()
 {
     QCursor cursor = QWindow::cursor();
@@ -121,7 +125,7 @@ void OpenGLWindow::keyPressEvent(QKeyEvent *event)
 void OpenGLWindow::mouseMoveEvent(QMouseEvent * event)
 {
     Q_UNUSED(event)
-    if (windowState() == Qt::WindowFullScreen) {           
+    if (windowState() == Qt::WindowFullScreen) {
         m_cursorHideTimer->stop();
         showCursor();
         m_cursorHideTimer->start(2000);
