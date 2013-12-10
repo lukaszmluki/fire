@@ -9,14 +9,16 @@
 #define SRC_OPENGL_WINDOW_H
 
 #include <QWindow>
+#include "opengldelegate.h"
 
 class FFEngine;
 class QOpenGLContext;
 class QTimer;
 
-class OpenGLWindow : public QWindow
+class OpenGLWindow : public QWindow, public OpenGLDelegate
 {
     Q_OBJECT
+    Q_DISABLE_COPY(OpenGLWindow)
 public:
     explicit OpenGLWindow(QWindow *parent = 0);
     virtual ~OpenGLWindow();
@@ -24,9 +26,10 @@ public:
 public slots:
     void toggleFullscreen();
     //for OpenGL
-    void swapBuffer();
-    void makeContextCurrent();
-    void getWindowSize(int *width, int *height);
+    virtual void fillWithColor(const QColor &color = Qt::black);
+    virtual void swapBuffer();
+    virtual void makeContextCurrent();
+    virtual void getWindowSize(int *width, int *height);
 
 private slots:
     void openSelectedFile();
@@ -40,7 +43,6 @@ protected:
 
 private:
     QOpenGLContext *m_context;
-    FFEngine *m_engine;
     QTimer *m_cursorHideTimer;
 };
 

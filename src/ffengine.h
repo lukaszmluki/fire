@@ -17,6 +17,7 @@ extern "C" {
 class FFEngine : public QObject
 {
     Q_OBJECT
+    Q_DISABLE_COPY(FFEngine)
 public:
     FFEngine(const QString &videoDevice, const QString &audioDevice, QObject *parent = 0);
     virtual ~FFEngine();

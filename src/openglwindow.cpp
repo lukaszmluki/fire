@@ -10,34 +10,24 @@
 #include <QCursor>
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include <QDebug>
 #include <QOpenGLContext>
 #include <QCoreApplication>
 #include <QTimer>
 #include "ffengine.h"
 #include "preferences.h"
+#include "playermanager.h"
 
 OpenGLWindow::OpenGLWindow(QWindow *parent) :
     QWindow(parent),
     m_context(0),
-    m_engine(new FFEngine("opengl", "pulse", this)),
     m_cursorHideTimer(new QTimer(this))
 {
     setSurfaceType(QWindow::OpenGLSurface);
 
-    QObject::connect(m_engine, SIGNAL(beforeWriteHeader()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
-    QObject::connect(m_engine, SIGNAL(beforeWritePacket()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
-    QObject::connect(m_engine, SIGNAL(beforeWriteTrailer()), this, SLOT(makeContextCurrent()), Qt::DirectConnection);
-
-    QObject::connect(m_engine, SIGNAL(afterWriteHeader()), this, SLOT(swapBuffer()), Qt::DirectConnection);
-    QObject::connect(m_engine, SIGNAL(afterWritePacket()), this, SLOT(swapBuffer()), Qt::DirectConnection);
-    QObject::connect(m_engine, SIGNAL(afterWriteTrailer()), this, SLOT(swapBuffer()), Qt::DirectConnection);
-
-    QObject::connect(m_engine, SIGNAL(getWindowSize(int *, int *)), this, SLOT(getWindowSize(int *, int *)), Qt::DirectConnection);
-
     QObject::connect(m_cursorHideTimer, SIGNAL(timeout()), this, SLOT(hideCursor()));
-
     QTimer::singleShot(0, this, SLOT(openSelectedFile()));
+
+    PlayerManager::instance().registerPlayer(this);
 }
 
 OpenGLWindow::~OpenGLWindow()
@@ -69,7 +59,7 @@ void OpenGLWindow::makeContextCurrent()
         m_context->setFormat(requestedFormat());
         m_context->create();
         if (!m_context->isValid())
-            qDebug() << "Context is not valid";
+            qCritical("Context is not valid");
     }
     m_context->makeCurrent(this);
 }
@@ -82,7 +72,7 @@ void OpenGLWindow::getWindowSize(int *width, int *height)
 
 void OpenGLWindow::openSelectedFile()
 {
-    m_engine->open(Preferences::instance().getSelectedFile());
+    PlayerManager::instance().getPlayer(this)->open(Preferences::instance().getSelectedFile());
 }
 
 void OpenGLWindow::hideCursor()
@@ -112,7 +102,7 @@ void OpenGLWindow::keyPressEvent(QKeyEvent *event)
         toggleFullscreen();
     } else if (event->key() == Qt::Key_Space) {
         event->accept();
-        m_engine->togglePause();
+        PlayerManager::instance().getPlayer(this)->togglePause();
     } else if (event->key() == Qt::Key_Escape) {
         event->accept();
         if (windowState() == Qt::WindowFullScreen)
@@ -130,4 +120,9 @@ void OpenGLWindow::mouseMoveEvent(QMouseEvent * event)
         showCursor();
         m_cursorHideTimer->start(2000);
     }
+}
+
+void OpenGLWindow::fillWithColor(const QColor &color)
+{
+
 }

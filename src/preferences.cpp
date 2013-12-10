@@ -24,13 +24,11 @@ Preferences::~Preferences()
 
 Preferences::Preferences()
 {
-    QString m_configFile;
+    QString m_configFile = QDir::homePath();
     qDebug() << "Loading preferences...";
 #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    m_configFile = getenv("HOME");
     m_configFile.append( "/.opensubedit/config.ini");
 #elif defined(Q_OS_WIN32)
-    m_configFile = getenv("USERPROFILE");
     m_configFile.append( "\\Open SubEdit\\config.ini");
 #endif
     qDebug() << m_configFile;
@@ -70,15 +68,9 @@ const QString& Preferences::getSelectedFile() const
 
 void Preferences::createDefaultConfig()
 {
-    setValue("editor/encoding", "default");
-#ifdef Q_WS_WIN
-    setValue("editor/end_line_mark", 1);
-#elif defined Q_WS_X11
-    setValue("editor/end_line_mark", 0);
-#else
-    setValue("editor/end_line_mark", 2);
-#endif
-    setValue("editor/spellchecking", false);
+    setValue("last_dir", QDir::homePath());
+    setValue("Window/width", 640);
+    setValue("Window/height", 480);
 }
 
 void Preferences::setLastDir(const QString &dir)

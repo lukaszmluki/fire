@@ -6,10 +6,12 @@
  */
 
 #include <QGuiApplication>
+#include <QApplication>
 #include <QString>
 #include <QFile>
 #include <QDebug>
 #include "openglwindow.h"
+#include "mainwindow.h"
 #include "preferences.h"
 
 namespace {
@@ -18,7 +20,7 @@ const char *PARAM_WINDOWED = "--windowed";
 void parseArgs(int argc, char **argv)
 {
     //set defaults
-    Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
+    Preferences::instance().setViewMode(Preferences::VIEW_MODE_GUI);
     //scan params
     QStringList params;
     for (int i = 1; i < argc; i++)
@@ -42,15 +44,19 @@ void parseArgs(int argc, char **argv)
 int main(int argc, char **argv)
 {
     parseArgs(argc, argv);
-    QSurfaceFormat format;
-    format.setSamples(4);
 
     if (Preferences::instance().getViewMode() == Preferences::VIEW_MODE_WINDOWED) {
+        QSurfaceFormat format;
+        format.setSamples(4);
         QGuiApplication app(argc, argv);
         OpenGLWindow window;
         window.setFormat(format);
         window.resize(640, 480);
         window.show();
+        return app.exec();
+    } else {
+        QApplication app(argc, argv);
+        MainWindow window;
         return app.exec();
     }
 }
