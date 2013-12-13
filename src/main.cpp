@@ -16,6 +16,7 @@
 
 namespace {
 const char *PARAM_WINDOWED = "--windowed";
+const char *PARAM_WINDOWED_S = "-w";
 
 void parseArgs(int argc, char **argv)
 {
@@ -28,6 +29,9 @@ void parseArgs(int argc, char **argv)
 
     if (params.removeAll(PARAM_WINDOWED))
         Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
+    if (params.removeAll(PARAM_WINDOWED_S))
+        Preferences::instance().setViewMode(Preferences::VIEW_MODE_WINDOWED);
+
 
     Q_FOREACH(QString param, params) {
         if (QFile::exists(param)) {
