@@ -13,6 +13,7 @@
 #include <QOpenGLContext>
 #include <QCoreApplication>
 #include <QTimer>
+#include "utils.h"
 #include "ffengine.h"
 #include "preferences.h"
 #include "playermanager.h"
@@ -23,6 +24,7 @@ OpenGLWindow::OpenGLWindow(QWindow *parent) :
     m_cursorHideTimer(new QTimer(this))
 {
     setSurfaceType(QWindow::OpenGLSurface);
+    setTitle(Utils::APPLICATION_NAME);
 
     QObject::connect(m_cursorHideTimer, SIGNAL(timeout()), this, SLOT(hideCursor()));
     QTimer::singleShot(0, this, SLOT(openSelectedFile()));
@@ -72,7 +74,11 @@ void OpenGLWindow::getWindowSize(int *width, int *height)
 
 void OpenGLWindow::openSelectedFile()
 {
-    PlayerManager::instance().getPlayer(this)->open(Preferences::instance().getSelectedFile());
+    QString file = Preferences::instance().getSelectedFile();
+    if (!file.isEmpty()) {
+        PlayerManager::instance().getPlayer(this)->open(file);
+        setTitle(file);
+    }
 }
 
 void OpenGLWindow::hideCursor()

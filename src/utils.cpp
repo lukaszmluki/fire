@@ -9,6 +9,8 @@
 
 namespace Utils {
 
+const QString APPLICATION_NAME("Fire Player");
+
 QString imagePath(const QString &file)
 {
 #if defined Q_OS_LINUX

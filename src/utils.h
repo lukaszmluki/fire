@@ -12,6 +12,8 @@
 
 namespace Utils {
 
+extern const QString APPLICATION_NAME;
+
 QString imagePath(const QString &file);
 
 }
