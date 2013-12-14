@@ -30,6 +30,8 @@ public slots:
     virtual void swapBuffer();
     virtual void makeContextCurrent();
     virtual void getWindowSize(int *width, int *height);
+    virtual void moveContextToDeviceThread() {}
+    virtual void moveContextToMainThread() {}
 
 private slots:
     void openSelectedFile();

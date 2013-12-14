@@ -13,6 +13,8 @@
 class OpenGLDelegate
 {
     virtual void fillWithColor(const QColor &color = Qt::black) = 0;
+    virtual void moveContextToDeviceThread() = 0;
+    virtual void moveContextToMainThread() = 0;
     virtual void swapBuffer() = 0;
     virtual void makeContextCurrent() = 0;
     virtual void getWindowSize(int *width, int *height) = 0;

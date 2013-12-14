@@ -23,6 +23,7 @@ class QActionGroup;
 class QHBoxLayout;
 class QToolBar;
 class QSlider;
+class QSplitter;
 
 class MainWindow : public QMainWindow
 {
@@ -70,6 +71,7 @@ private:
     QSlider *m_positionSlider;
     OpenGLWidget *m_videoArea;
     SubtitlesEditor *m_subtitlesEditor;
+    QSplitter *m_splitter;
 };
 
 #endif	/* SRC_MAINWINDOW_H */

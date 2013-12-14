@@ -23,6 +23,7 @@ OpenGLWindow::OpenGLWindow(QWindow *parent) :
     m_context(0),
     m_cursorHideTimer(new QTimer(this))
 {
+    qDebug("OpenGLWindow::OpenGLWindow");
     setSurfaceType(QWindow::OpenGLSurface);
     setTitle(Utils::APPLICATION_NAME);
 
@@ -40,10 +41,9 @@ void OpenGLWindow::toggleFullscreen()
 {
     if (windowState() == Qt::WindowFullScreen) {
         m_cursorHideTimer->stop();
-        showCursor();
         showNormal();
-    }
-    else {
+        showCursor();
+    } else {
         m_cursorHideTimer->start(2000);
         showFullScreen();
     }
@@ -52,6 +52,7 @@ void OpenGLWindow::toggleFullscreen()
 void OpenGLWindow::swapBuffer()
 {
     m_context->swapBuffers(this);
+    m_context->doneCurrent();
 }
 
 void OpenGLWindow::makeContextCurrent()
@@ -90,9 +91,7 @@ void OpenGLWindow::hideCursor()
 
 void OpenGLWindow::showCursor()
 {
-    QCursor cursor = QWindow::cursor();
-    cursor.setShape(Qt::ArrowCursor);
-    setCursor(cursor);
+    unsetCursor();
 }
 
 void OpenGLWindow::mouseDoubleClickEvent(QMouseEvent *event)
@@ -125,6 +124,7 @@ void OpenGLWindow::mouseMoveEvent(QMouseEvent * event)
         m_cursorHideTimer->stop();
         showCursor();
         m_cursorHideTimer->start(2000);
+        event->accept();
     }
 }
 

@@ -45,10 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_normalViewArea);
 
 //create splitter and bottom text line
-    QSplitter *splitter = new QSplitter(Qt::Vertical, m_normalViewArea);
+    m_splitter = new QSplitter(Qt::Vertical, m_normalViewArea);
     m_movieInfoLine = new QWidget();
     QHBoxLayout *hlayout = new QHBoxLayout(m_movieInfoLine);
-    layout->addWidget(splitter);
+    layout->addWidget(m_splitter);
     layout->addWidget(m_movieInfoLine);
 
 //fill bottom line
@@ -61,17 +61,16 @@ MainWindow::MainWindow(QWidget *parent) :
     hlayout->addWidget(m_videoLineInfo);
 
 //create widget for the splitter (1)
-    QWidget *vbox = new QWidget(splitter);
+    QWidget *vbox = new QWidget(m_splitter);
     layout = new QVBoxLayout(vbox);
     layout->setSpacing(2);
     layout->setMargin(0);
-    splitter->addWidget(vbox);
+    m_splitter->addWidget(vbox);
 
     m_videoArea = new OpenGLWidget(vbox);
     m_videoArea->setMinimumSize(100,100);
     layout->addWidget(m_videoArea);
-    splitter->setCollapsible(0, false);
-
+    m_splitter->setCollapsible(0, false);
 
         m_navigationPanel = new QWidget(vbox);
         hlayout = new QHBoxLayout(m_navigationPanel);
@@ -104,11 +103,11 @@ MainWindow::MainWindow(QWidget *parent) :
 	layout->addWidget(m_navigationPanel);
 
 //create widget for the splitter (2)
-    m_subtitlesEditorBox = new QWidget(splitter);
+    m_subtitlesEditorBox = new QWidget(m_splitter);
     layout = new QVBoxLayout(m_subtitlesEditorBox);
     layout->setSpacing(2);
     layout->setMargin(2);
-    splitter->addWidget(m_subtitlesEditorBox);
+    m_splitter->addWidget(m_subtitlesEditorBox);
     m_editorFileName = new QLabel("", m_subtitlesEditorBox);
     layout->addWidget(m_editorFileName);
     m_subtitlesEditor = new SubtitlesEditor(m_subtitlesEditorBox);
@@ -209,15 +208,11 @@ MainWindow::MainWindow(QWidget *parent) :
 //    if (x + w > desktop->width()) { w = desktop->availableGeometry().width(); x = desktop->availableGeometry().x(); }
 //    if (y + h > desktop->height()) { h = desktop->availableGeometry().height(); desktop->availableGeometry().y(); }
     setGeometry(x, y, w, h);
-    setWindowTitle(tr("Fire Plyaer"));
-    hideEditor();
+    setWindowTitle(Utils::APPLICATION_NAME);
 
 //register player
     PlayerManager::instance().registerPlayer(m_videoArea);
 
-//    PlayerFactory::setMainWindow(this);
-//    PlayerFactory::setSubtitlesEditor(m_subtitlesEditor);
-//    PlayerFactory::setVideoWidget(m_videoArea);
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));
 //    connect(m_subtitlesEditor, SIGNAL(infoLineTextChanged(const QString&)), this, SLOT(changeEditorInfoLine(const QString&)));
 //    connect(m_videoArea, SIGNAL(fullscreen(bool)), this, SLOT(fullscreen(bool)));
@@ -230,6 +225,8 @@ MainWindow::MainWindow(QWidget *parent) :
         showMaximized();
     else
         show();
+
+    hideEditor();
 }
 
 MainWindow::~MainWindow()

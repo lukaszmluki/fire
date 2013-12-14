@@ -38,6 +38,7 @@ FFEngine* PlayerManager::registerPlayer(OpenGLDelegate *window)
 
     m_players.insert(window, engine);
 
+    QObject::connect(engine, SIGNAL(beforeWriteHeader()), qo, SLOT(moveContextToDeviceThread()), Qt::DirectConnection);
     QObject::connect(engine, SIGNAL(beforeWriteHeader()), qo, SLOT(makeContextCurrent()), Qt::DirectConnection);
     QObject::connect(engine, SIGNAL(beforeWritePacket()), qo, SLOT(makeContextCurrent()), Qt::DirectConnection);
     QObject::connect(engine, SIGNAL(beforeWriteTrailer()), qo, SLOT(makeContextCurrent()), Qt::DirectConnection);
@@ -45,6 +46,7 @@ FFEngine* PlayerManager::registerPlayer(OpenGLDelegate *window)
     QObject::connect(engine, SIGNAL(afterWriteHeader()), qo, SLOT(swapBuffer()), Qt::DirectConnection);
     QObject::connect(engine, SIGNAL(afterWritePacket()), qo, SLOT(swapBuffer()), Qt::DirectConnection);
     QObject::connect(engine, SIGNAL(afterWriteTrailer()), qo, SLOT(swapBuffer()), Qt::DirectConnection);
+    QObject::connect(engine, SIGNAL(afterWriteTrailer()), qo, SLOT(moveContextToMainThread()), Qt::DirectConnection);
 
     QObject::connect(engine, SIGNAL(getWindowSize(int *, int *)), qo, SLOT(getWindowSize(int *, int *)), Qt::DirectConnection);
 
