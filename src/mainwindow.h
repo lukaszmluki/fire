@@ -24,6 +24,7 @@ class QHBoxLayout;
 class QToolBar;
 class QSlider;
 class QSplitter;
+class QToolButton;
 
 class MainWindow : public QMainWindow
 {
@@ -35,9 +36,8 @@ public:
 
 public slots:
 //    void quit();
-    void play();
+    void togglePause();
     void stop();
-    void pause();
 //    void next();
 //    void previous();
 //    void forward();
@@ -47,13 +47,19 @@ public slots:
     void showEditor();
     void hideEditor();
 
+private slots:
+    void paused();
+    void resumed();
+    void durationChanged(double duration);
+    void positionChanged(double position);
+
 protected:
     void resizeEvent(QResizeEvent *e);
     void moveEvent(QMoveEvent *e);
 
 private:
-    static QAction* addMenuAction(QMenu *menu, const QString &iconFile, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut, const QVariant &data, QActionGroup *group = NULL, bool showIcon = true);
-    void addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout);
+    QAction* addMenuAction(QMenu *menu, const QString &iconFile, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut, const QVariant &data, QActionGroup *group = NULL, bool showIcon = true);
+    QToolButton* addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout);
 
     QWidget *m_normalViewArea;
     QWidget *m_subtitlesEditorBox;
@@ -71,7 +77,8 @@ private:
     QSlider *m_positionSlider;
     OpenGLWidget *m_videoArea;
     SubtitlesEditor *m_subtitlesEditor;
-    QSplitter *m_splitter;
+    QSplitter *m_splitterVideoEditor;
+    QToolButton *m_playButton;
 };
 
 #endif	/* SRC_MAINWINDOW_H */

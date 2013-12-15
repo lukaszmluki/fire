@@ -45,10 +45,10 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_normalViewArea);
 
 //create splitter and bottom text line
-    m_splitter = new QSplitter(Qt::Vertical, m_normalViewArea);
+    m_splitterVideoEditor = new QSplitter(Qt::Vertical, m_normalViewArea);
     m_movieInfoLine = new QWidget();
     QHBoxLayout *hlayout = new QHBoxLayout(m_movieInfoLine);
-    layout->addWidget(m_splitter);
+    layout->addWidget(m_splitterVideoEditor);
     layout->addWidget(m_movieInfoLine);
 
 //fill bottom line
@@ -61,24 +61,23 @@ MainWindow::MainWindow(QWidget *parent) :
     hlayout->addWidget(m_videoLineInfo);
 
 //create widget for the splitter (1)
-    QWidget *vbox = new QWidget(m_splitter);
+    QWidget *vbox = new QWidget(m_splitterVideoEditor);
     layout = new QVBoxLayout(vbox);
     layout->setSpacing(2);
     layout->setMargin(0);
-    m_splitter->addWidget(vbox);
+    m_splitterVideoEditor->addWidget(vbox);
 
     m_videoArea = new OpenGLWidget(vbox);
     m_videoArea->setMinimumSize(100,100);
     layout->addWidget(m_videoArea);
-    m_splitter->setCollapsible(0, false);
+    m_splitterVideoEditor->setCollapsible(0, false);
 
         m_navigationPanel = new QWidget(vbox);
         hlayout = new QHBoxLayout(m_navigationPanel);
         hlayout->setSpacing(5);
         hlayout->setMargin(2);
         m_navigationPanel->setMaximumHeight(30);
-            addNavigationButton("navigation/play.bmp", SLOT(play()), hlayout);
-            addNavigationButton("navigation/pause.bmp", SLOT(pause()), hlayout);
+            m_playButton = addNavigationButton("navigation/play.bmp", SLOT(togglePause()), hlayout);
             addNavigationButton("navigation/stop.bmp", SLOT(stop()), hlayout);
             addNavigationButton("navigation/backward.bmp", SLOT(backward()), hlayout);
             addNavigationButton("navigation/forward.bmp", SLOT(forward()), hlayout);
@@ -90,24 +89,24 @@ MainWindow::MainWindow(QWidget *parent) :
             volume->setRange(0, 100);
             volume->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
             volume->setMaximumWidth(100);
-//	    connect(volume, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
+	    connect(volume, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
             hlayout->addWidget(volume);
             hlayout->addSpacing(20);
             m_positionSlider = new QSlider(Qt::Horizontal, m_navigationPanel);
             m_positionSlider->setTracking(false);
             m_positionSlider->setFocusPolicy(Qt::NoFocus);
-            m_positionSlider->setRange(0, 1000);
+            m_positionSlider->setRange(0, 0);
             m_positionSlider->setSliderPosition(0);
-//            connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
+            connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
 	    hlayout->addWidget(m_positionSlider);
 	layout->addWidget(m_navigationPanel);
 
 //create widget for the splitter (2)
-    m_subtitlesEditorBox = new QWidget(m_splitter);
+    m_subtitlesEditorBox = new QWidget(m_splitterVideoEditor);
     layout = new QVBoxLayout(m_subtitlesEditorBox);
     layout->setSpacing(2);
     layout->setMargin(2);
-    m_splitter->addWidget(m_subtitlesEditorBox);
+    m_splitterVideoEditor->addWidget(m_subtitlesEditorBox);
     m_editorFileName = new QLabel("", m_subtitlesEditorBox);
     layout->addWidget(m_editorFileName);
     m_subtitlesEditor = new SubtitlesEditor(m_subtitlesEditorBox);
@@ -211,7 +210,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(Utils::APPLICATION_NAME);
 
 //register player
-    PlayerManager::instance().registerPlayer(m_videoArea);
+    FFEngine *player = PlayerManager::instance().registerPlayer(m_videoArea);
+    connect(player, SIGNAL(paused()), this, SLOT(paused()));
+    connect(player, SIGNAL(resumed()), this, SLOT(resumed()));
+    connect(player, SIGNAL(durationChanged(double)), this, SLOT(durationChanged(double)));
+    connect(player, SIGNAL(positionChanged(double)), this, SLOT(positionChanged(double)));
 
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));
 //    connect(m_subtitlesEditor, SIGNAL(infoLineTextChanged(const QString&)), this, SLOT(changeEditorInfoLine(const QString&)));
@@ -233,24 +236,26 @@ MainWindow::~MainWindow()
 {
 }
 
-void MainWindow::addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout)
+QToolButton* MainWindow::addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout)
 {
     QToolButton *button = new QToolButton(m_navigationPanel);
     button->setIcon(QIcon(Utils::imagePath(iconFile)));
     button->setFocusPolicy(Qt::NoFocus);
     connect(button, SIGNAL(clicked()), this, member);
     layout->addWidget(button);
+    return button;
 }
 
-QAction* MainWindow::addMenuAction(QMenu *menu, const QString &iconFile, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut, const QVariant &data, QActionGroup *group, bool showIcon)
+QAction* MainWindow::addMenuAction(QMenu *menu, const QString &iconFile, const QString &text,
+                                   const QObject *receiver, const char *member, const QKeySequence &shortcut,
+                                   const QVariant &data, QActionGroup *group, bool showIcon)
 {
     QAction *action;
     if (!iconFile.isEmpty()) {
         QIcon icon(iconFile);
         action = menu->addAction(icon, text, receiver, member, shortcut);
         action->setIconVisibleInMenu(showIcon);
-    }
-    else {
+    } else {
         action = menu->addAction(text, receiver, member, shortcut);
     }
     action->setData(data);
@@ -294,7 +299,10 @@ void MainWindow::hideEditor()
 
 void MainWindow::loadVideo()
 {
-    QString filename = QFileDialog::getOpenFileName(NULL, tr("Select movie"), Preferences::instance().getValue("last_dir", QString(getenv("HOME"))).toString(), tr("Video files *.avi"));
+    QString filename = QFileDialog::getOpenFileName(
+            NULL, tr("Select movie"),
+            Preferences::instance().getValue("last_dir", QString(getenv("HOME"))).toString(),
+            tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg"));
     if (filename.isEmpty() || !QFile::exists(filename)) {
         qDebug() << "no file selected, exit";
         return;
@@ -302,7 +310,6 @@ void MainWindow::loadVideo()
     Preferences::instance().setLastDir(filename);
 
     PlayerManager::instance().getPlayer(m_videoArea)->open(filename);
-
 
 //    filename = filename.left(filename.lastIndexOf(".")) + "txt";
 //    if (QFile::exists(filename)) {
@@ -316,17 +323,33 @@ void MainWindow::closeVideo()
 
 }
 
-void MainWindow::play()
-{
-
-}
-
 void MainWindow::stop()
 {
 
 }
 
-void MainWindow::pause()
+void MainWindow::togglePause()
 {
+    PlayerManager::instance().getPlayer(m_videoArea)->togglePause();
+}
 
+void MainWindow::paused()
+{
+    m_playButton->setIcon(QIcon(Utils::imagePath("navigation/play.bmp")));
+}
+
+void MainWindow::resumed()
+{
+    m_playButton->setIcon(QIcon(Utils::imagePath("navigation/pause.bmp")));
+}
+
+void MainWindow::durationChanged(double duration)
+{
+    m_positionSlider->setMaximum(duration);
+}
+
+void MainWindow::positionChanged(double position)
+{
+    if (!m_positionSlider->isSliderDown())
+        m_positionSlider->setSliderPosition(position);
 }

@@ -13,14 +13,17 @@ extern "C" {
 #include "ffengine.h"
 #include "systemdelegates.h"
 
-AVEngineCallback FFEngine::m_staticCallbacks = {
-    FFEngine::staticFinishedCallback,
-    FFEngine::staticAudioOutputContextCreatedCallback,
-    FFEngine::staticVideoOutputContextCreatedCallback
-};
+AVEngineCallback FFEngine::m_staticCallbacks;
 
 int FFEngine::initializeFFmpeg()
 {
+    m_staticCallbacks.finished = staticFinishedCallback;
+    m_staticCallbacks.pause_state_changed = staticPauseChangedCallback;
+    m_staticCallbacks.position_changed = staticPositionChanged;
+    m_staticCallbacks.duration_changed = staticDurationChanged;
+    m_staticCallbacks.audio_output_context_created = staticAudioOutputContextCreatedCallback;
+    m_staticCallbacks.video_output_context_created = staticVideoOutputContextCreatedCallback;
+
     av_register_all();
     avdevice_register_all();
     avfilter_register_all();
@@ -139,38 +142,76 @@ int FFEngine::windowSizeCallback(int *width, int *height)
 void FFEngine::staticFinishedCallback(AVEngineContext *ctx)
 {
     FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
-    _this->finishedCallback(ctx);
+    _this->finishedCallback();
+}
+
+void FFEngine::staticPauseChangedCallback(AVEngineContext *ctx)
+{
+    FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
+    _this->pauseChangedCallback();
+}
+
+void FFEngine::staticPositionChanged(AVEngineContext *ctx)
+{
+    FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
+    _this->positionChanged();
+}
+
+void FFEngine::staticDurationChanged(AVEngineContext *ctx)
+{
+    FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
+    _this->durationChanged();
 }
 
 void FFEngine::staticAudioOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *actx)
 {
     FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
-    _this->audioOutputContextCreatedCallback(ctx, actx);
+    _this->audioOutputContextCreatedCallback(actx);
 }
 
 void FFEngine::staticVideoOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *vctx)
 {
     FFEngine *_this = static_cast<FFEngine *>(avengine_context_get_user_data(ctx));
-    _this->videoOutputContextCreatedCallback(ctx, vctx);
+    _this->videoOutputContextCreatedCallback(vctx);
 }
 
-void FFEngine::finishedCallback(AVEngineContext *ctx)
+void FFEngine::finishedCallback()
 {
-    Q_UNUSED(ctx);
-    qDebug() << "finishedCallback";
+    emit finished();
 }
 
-void FFEngine::audioOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *actx)
+void FFEngine::pauseChangedCallback()
 {
-    Q_UNUSED(ctx);
-    qDebug() << "audioOutputContextCreatedCallback";
+    int paused = avengine_is_paused(m_AVEngineContext);
+    if (paused > 0)
+        emit FFEngine::paused();
+    else if (!paused)
+        emit FFEngine::resumed();
+}
+
+void FFEngine::positionChanged()
+{
+    double position = avengine_get_position(m_AVEngineContext);
+    //qDebug() << "position" << position;
+    if (!isnan(position))
+        emit positionChanged(position);
+}
+
+void FFEngine::durationChanged()
+{
+    double duration = avengine_get_duration(m_AVEngineContext);
+    //qDebug() << "duration" << duration;
+    if (!isnan(duration))
+        emit durationChanged(duration);
+}
+
+void FFEngine::audioOutputContextCreatedCallback(AVFormatContext *actx)
+{
     av_format_set_user_data(actx, this);
 }
 
-void FFEngine::videoOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *vctx)
+void FFEngine::videoOutputContextCreatedCallback(AVFormatContext *vctx)
 {
-    Q_UNUSED(ctx);
-    qDebug() << "videoOutputContextCreatedCallback";
     //TODO: this should be done by engine API
     av_format_set_user_data(vctx, this);
     av_format_set_before_write_header_cb(vctx, staticBeforeWriteHeaderCallback);
@@ -226,5 +267,24 @@ bool FFEngine::open(const QString &media)
 
 void FFEngine::togglePause()
 {
-    avengine_toggle_pause(m_AVEngineContext);
+    if (m_AVEngineContext)
+        avengine_toggle_pause(m_AVEngineContext);
+}
+
+void FFEngine::pause()
+{
+    if (m_AVEngineContext)
+        avengine_pause(m_AVEngineContext, 1);
+}
+
+void FFEngine::resume()
+{
+    if (m_AVEngineContext)
+        avengine_pause(m_AVEngineContext, 0);
+}
+
+void FFEngine::seek(double seconds)
+{
+    if (m_AVEngineContext)
+        avengine_seek(m_AVEngineContext, seconds);
 }

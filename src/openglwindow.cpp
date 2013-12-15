@@ -105,6 +105,8 @@ void OpenGLWindow::keyPressEvent(QKeyEvent *event)
     if (event->key() == Qt::Key_F) {
         event->accept();
         toggleFullscreen();
+    } else if (event->key() == Qt::Key_Q) {
+        PlayerManager::instance().getPlayer(this)->seek(2);
     } else if (event->key() == Qt::Key_Space) {
         event->accept();
         PlayerManager::instance().getPlayer(this)->togglePause();

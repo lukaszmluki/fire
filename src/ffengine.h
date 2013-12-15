@@ -26,6 +26,9 @@ public:
 
 public slots:
     void togglePause();
+    void pause();
+    void resume();
+    void seek(double seconds);
 
 signals:
     // OpenGL signals
@@ -38,10 +41,13 @@ signals:
     void getWindowSize(int *, int *);
     // Player signals
     void finished();
+    void paused();
+    void resumed();
+    void durationChanged(double duration);
+    void positionChanged(double position);
 
 private:
     static int initializeFFmpeg();
-
 
     // OpenGL device callbacks
     static int staticBeforeWriteHeaderCallback(struct AVFormatContext *ctx, void *extra);
@@ -61,11 +67,17 @@ private:
 
     // Player callbacks
     static void staticFinishedCallback(AVEngineContext *ctx);
+    static void staticPauseChangedCallback(AVEngineContext *ctx);
+    static void staticPositionChanged(AVEngineContext *ctx);
+    static void staticDurationChanged(AVEngineContext *ctx);
     static void staticAudioOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *actx);
     static void staticVideoOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *vctx);
-    void finishedCallback(AVEngineContext *ctx);
-    void audioOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *actx);
-    void videoOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *vctx);
+    void finishedCallback();
+    void pauseChangedCallback();
+    void positionChanged();
+    void durationChanged();
+    void audioOutputContextCreatedCallback(AVFormatContext *actx);
+    void videoOutputContextCreatedCallback(AVFormatContext *vctx);
 
     bool createContext();
     void freeContext();
