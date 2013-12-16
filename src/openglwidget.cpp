@@ -10,11 +10,12 @@
 #include <QCoreApplication>
 #include <QWaitCondition>
 #include <QMutex>
+#include <QPaintEvent>
 
 const QEvent::Type OpenGLWidget::m_moveContextEvent = static_cast<QEvent::Type>(QEvent::registerEventType());
 
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
-    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), NULL),
+    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent),
     m_contextMovedLock(new QMutex),
     m_contextMoved(new QWaitCondition)
 {
@@ -61,16 +62,10 @@ void OpenGLWidget::getWindowSize(int *width, int *height)
 
 void OpenGLWidget::fillWithColor(const QColor &color)
 {
-    qDebug("aaa");
     makeCurrent();
     qglClearColor(color);
     glClear(GL_COLOR_BUFFER_BIT);
     swapBuffer();
-}
-
-void OpenGLWidget::paintGL()
-{
-    fillWithColor(Qt::red);
 }
 
 bool OpenGLWidget::event(QEvent *event)
@@ -79,12 +74,28 @@ bool OpenGLWidget::event(QEvent *event)
         MoveContextEvent *e = static_cast<MoveContextEvent *>(event);
         QThread *thread = e->getThread();
         if (!thread)
-            QThread::currentThread();
+            thread = QThread::currentThread();
         m_contextMovedLock->lock();
         context()->moveToThread(thread);
         m_contextMovedLock->unlock();
         m_contextMoved->wakeAll();
         return true;
     }
-    return false;
+    return QGLWidget::event(event);
+}
+
+void OpenGLWidget::resizeGL(int width, int height)
+{
+    Q_UNUSED(width)
+    Q_UNUSED(height)
+}
+
+void OpenGLWidget::paintGL()
+{
+    //fillWithColor();
+}
+
+void OpenGLWidget::paintEvent(QPaintEvent *event)
+{
+    event->accept();
 }

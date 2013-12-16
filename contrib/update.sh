@@ -10,7 +10,7 @@ pushd ffmpeg
 git fetch origin
 git checkout fire
 git reset --hard origin/fire
-./configure  --prefix=../../external --disable-programs --disable-doc --enable-libpulse
+./configure  --prefix=../../external --disable-programs --disable-doc --enable-libpulse --enable-libssh
 make -j16
 make install
 popd

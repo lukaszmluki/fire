@@ -31,8 +31,10 @@ public:
     ~OpenGLWidget();
 
 protected:
-    virtual void paintGL();
     virtual bool event(QEvent *event);
+    virtual void paintEvent(QPaintEvent * event);
+    virtual void paintGL();
+    virtual void resizeGL(int width, int height);
 
 public slots:
     virtual void moveContextToDeviceThread();

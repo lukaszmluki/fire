@@ -23,6 +23,7 @@
 #include <QToolBar>
 #include <QSlider>
 #include <QFileDialog>
+#include <QDir>
 #include "utils.h"
 #include "preferences.h"
 #include "openglwidget.h"
@@ -38,20 +39,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu *menu;
 
 //create main window
-    m_normalViewArea = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(m_normalViewArea);
+    QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(0);
     layout->setMargin(4);
-    setCentralWidget(m_normalViewArea);
+    m_normalViewArea = new QWidget();
+    m_normalViewArea->setLayout(layout);
 
 //create splitter and bottom text line
-    m_splitterVideoEditor = new QSplitter(Qt::Vertical, m_normalViewArea);
+    QHBoxLayout *hlayout = new QHBoxLayout();
     m_movieInfoLine = new QWidget();
-    QHBoxLayout *hlayout = new QHBoxLayout(m_movieInfoLine);
-    layout->addWidget(m_splitterVideoEditor);
-    layout->addWidget(m_movieInfoLine);
-
-//fill bottom line
+    m_movieInfoLine->setLayout(hlayout);
     hlayout->setSpacing(5);
     hlayout->setContentsMargins(0, 1, 0, 0);
     m_videoLinePosition = new QLabel();
@@ -59,54 +56,60 @@ MainWindow::MainWindow(QWidget *parent) :
     hlayout->addStretch(1);
     m_videoLineInfo = new QLabel();
     hlayout->addWidget(m_videoLineInfo);
-
+    m_normalViewArea->layout()->addWidget(m_movieInfoLine);
+    
 //create widget for the splitter (1)
-    QWidget *vbox = new QWidget(m_splitterVideoEditor);
-    layout = new QVBoxLayout(vbox);
+    m_splitterVideoEditor = new QSplitter(Qt::Vertical);
+    layout = new QVBoxLayout();
     layout->setSpacing(2);
     layout->setMargin(0);
-    m_splitterVideoEditor->addWidget(vbox);
+    QWidget *vbox = new QWidget();
+    vbox->setLayout(layout);
 
-    m_videoArea = new OpenGLWidget(vbox);
+    m_videoArea = new OpenGLWidget();
     m_videoArea->setMinimumSize(100,100);
     layout->addWidget(m_videoArea);
+
+    hlayout = new QHBoxLayout();
+    hlayout->setSpacing(5);
+    hlayout->setMargin(2);
+    m_navigationPanel = new QWidget();
+    m_navigationPanel->setLayout(hlayout);
+    m_navigationPanel->setMaximumHeight(30);
+
+        m_playButton = addNavigationButton("navigation/play.bmp", SLOT(togglePause()), hlayout);
+        addNavigationButton("navigation/stop.bmp", SLOT(stop()), hlayout);
+        addNavigationButton("navigation/backward.bmp", SLOT(backward()), hlayout);
+        addNavigationButton("navigation/forward.bmp", SLOT(forward()), hlayout);
+        addNavigationButton("navigation/previous.bmp", SLOT(previous()), hlayout);
+        addNavigationButton("navigation/next.bmp", SLOT(next()), hlayout);
+        hlayout->addSpacing(20);
+        QSlider *volume = new QSlider(Qt::Horizontal);
+        volume->setFocusPolicy(Qt::NoFocus);
+        volume->setRange(0, 100);
+        volume->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
+        volume->setMaximumWidth(100);
+        connect(volume, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
+        hlayout->addWidget(volume);
+        hlayout->addSpacing(20);
+        m_positionSlider = new QSlider(Qt::Horizontal);
+        m_positionSlider->setTracking(false);
+        m_positionSlider->setFocusPolicy(Qt::NoFocus);
+        m_positionSlider->setRange(0, 0);
+        m_positionSlider->setSliderPosition(0);
+        connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
+	    hlayout->addWidget(m_positionSlider);
+
+    layout->addWidget(m_navigationPanel);
+    m_splitterVideoEditor->addWidget(vbox);
     m_splitterVideoEditor->setCollapsible(0, false);
 
-        m_navigationPanel = new QWidget(vbox);
-        hlayout = new QHBoxLayout(m_navigationPanel);
-        hlayout->setSpacing(5);
-        hlayout->setMargin(2);
-        m_navigationPanel->setMaximumHeight(30);
-            m_playButton = addNavigationButton("navigation/play.bmp", SLOT(togglePause()), hlayout);
-            addNavigationButton("navigation/stop.bmp", SLOT(stop()), hlayout);
-            addNavigationButton("navigation/backward.bmp", SLOT(backward()), hlayout);
-            addNavigationButton("navigation/forward.bmp", SLOT(forward()), hlayout);
-            addNavigationButton("navigation/previous.bmp", SLOT(previous()), hlayout);
-            addNavigationButton("navigation/next.bmp", SLOT(next()), hlayout);
-            hlayout->addSpacing(20);
-            QSlider *volume = new QSlider(Qt::Horizontal, m_navigationPanel);
-            volume->setFocusPolicy(Qt::NoFocus);
-            volume->setRange(0, 100);
-            volume->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
-            volume->setMaximumWidth(100);
-	    connect(volume, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
-            hlayout->addWidget(volume);
-            hlayout->addSpacing(20);
-            m_positionSlider = new QSlider(Qt::Horizontal, m_navigationPanel);
-            m_positionSlider->setTracking(false);
-            m_positionSlider->setFocusPolicy(Qt::NoFocus);
-            m_positionSlider->setRange(0, 0);
-            m_positionSlider->setSliderPosition(0);
-            connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
-	    hlayout->addWidget(m_positionSlider);
-	layout->addWidget(m_navigationPanel);
-
 //create widget for the splitter (2)
-    m_subtitlesEditorBox = new QWidget(m_splitterVideoEditor);
-    layout = new QVBoxLayout(m_subtitlesEditorBox);
+    layout = new QVBoxLayout();
     layout->setSpacing(2);
     layout->setMargin(2);
-    m_splitterVideoEditor->addWidget(m_subtitlesEditorBox);
+    m_subtitlesEditorBox = new QWidget();
+    m_subtitlesEditorBox->setLayout(layout);
     m_editorFileName = new QLabel("", m_subtitlesEditorBox);
     layout->addWidget(m_editorFileName);
     m_subtitlesEditor = new SubtitlesEditor(m_subtitlesEditorBox);
@@ -115,6 +118,10 @@ MainWindow::MainWindow(QWidget *parent) :
     layout->addWidget(m_subtitlesEditor);
     m_editorInfoLine = new QLabel("", m_subtitlesEditorBox);
     layout->addWidget(m_editorInfoLine);
+    m_splitterVideoEditor->addWidget(m_subtitlesEditorBox);
+
+    m_normalViewArea->layout()->addWidget(m_splitterVideoEditor);
+    setCentralWidget(m_normalViewArea);
 
 //TOOL BARS
     m_fileToolBar = addToolBar(tr("File"));
@@ -193,7 +200,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    menu = menuBar()->addMenu(tr("&Options"));
 //	action = addMenuAction(menu, imagePath("menu/pref.bmp"), tr("&Preferences"), optionsWindow, SLOT(exec()), QKeySequence(Qt::Key_U + Qt::CTRL), QVariant(0));
 //	m_stuffToolBar->addAction(action);
-//
+
 //display main window
     QDesktopWidget *desktop = QApplication::desktop();
     int x = Preferences::instance().getValue("Window/x", desktop->availableGeometry().x()).toInt();
@@ -204,8 +211,8 @@ MainWindow::MainWindow(QWidget *parent) :
         x = desktop->availableGeometry().x();
     if (y > desktop->availableGeometry().height() + desktop->availableGeometry().y())
         y = desktop->availableGeometry().y();
-//    if (x + w > desktop->width()) { w = desktop->availableGeometry().width(); x = desktop->availableGeometry().x(); }
-//    if (y + h > desktop->height()) { h = desktop->availableGeometry().height(); desktop->availableGeometry().y(); }
+    //if (x + w > desktop->width()) { w = desktop->availableGeometry().width(); x = desktop->availableGeometry().x(); }
+    //if (y + h > desktop->height()) { h = desktop->availableGeometry().height(); desktop->availableGeometry().y(); }
     setGeometry(x, y, w, h);
     setWindowTitle(Utils::APPLICATION_NAME);
 
@@ -301,7 +308,7 @@ void MainWindow::loadVideo()
 {
     QString filename = QFileDialog::getOpenFileName(
             NULL, tr("Select movie"),
-            Preferences::instance().getValue("last_dir", QString(getenv("HOME"))).toString(),
+            Preferences::instance().getValue("last_dir", QDir::homePath()).toString(),
             tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg"));
     if (filename.isEmpty() || !QFile::exists(filename)) {
         qDebug() << "no file selected, exit";
