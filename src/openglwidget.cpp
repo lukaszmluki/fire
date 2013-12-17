@@ -20,6 +20,8 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
     m_contextMoved(new QWaitCondition)
 {
     setAutoFillBackground(false);
+    QGLWidget::makeCurrent();
+    QGLWidget::doneCurrent();
 }
 
 OpenGLWidget::~OpenGLWidget()
@@ -29,6 +31,7 @@ OpenGLWidget::~OpenGLWidget()
 void OpenGLWidget::swapBuffer()
 {
     QGLWidget::swapBuffers();
+    QGLWidget::doneCurrent();
 }
 
 void OpenGLWidget::makeContextCurrent()
@@ -46,10 +49,7 @@ void OpenGLWidget::moveContextToDeviceThread()
 
 void OpenGLWidget::moveContextToMainThread()
 {
-    m_contextMovedLock->lock();
-    QCoreApplication::postEvent(this, new MoveContextEvent(NULL));
-    m_contextMoved->wait(m_contextMovedLock);
-    m_contextMovedLock->unlock();
+    context()->moveToThread(thread());
 }
 
 void OpenGLWidget::getWindowSize(int *width, int *height)
@@ -72,11 +72,8 @@ bool OpenGLWidget::event(QEvent *event)
 {
     if (event->type() == m_moveContextEvent) {
         MoveContextEvent *e = static_cast<MoveContextEvent *>(event);
-        QThread *thread = e->getThread();
-        if (!thread)
-            thread = QThread::currentThread();
         m_contextMovedLock->lock();
-        context()->moveToThread(thread);
+        context()->moveToThread(e->getThread());
         m_contextMovedLock->unlock();
         m_contextMoved->wakeAll();
         return true;
@@ -88,14 +85,17 @@ void OpenGLWidget::resizeGL(int width, int height)
 {
     Q_UNUSED(width)
     Q_UNUSED(height)
+    //QGLWidget::resizeGL(width, height);
 }
 
 void OpenGLWidget::paintGL()
 {
-    //fillWithColor();
+    //QGLWidget::paintGL();
 }
 
 void OpenGLWidget::paintEvent(QPaintEvent *event)
 {
-    event->accept();
+    //fillWithColor();
+    //event->accept();
+    //QGLWidget::paintEvent(event);
 }
