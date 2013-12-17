@@ -20,7 +20,7 @@
 
 OpenGLWindow::OpenGLWindow(QWindow *parent) :
     QWindow(parent),
-    m_context(0),
+    m_context(NULL),
     m_cursorHideTimer(new QTimer(this))
 {
     qDebug("OpenGLWindow::OpenGLWindow");

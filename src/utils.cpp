@@ -6,10 +6,14 @@
  */
 
 #include "utils.h"
+#include <QFileDialog>
+#include <QDir>
+#include "preferences.h"
 
 namespace Utils {
 
 const QString APPLICATION_NAME("Fire Player");
+const QString VIDEO_FILTER = QObject::tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv");
 
 QString imagePath(const QString &file)
 {
@@ -21,6 +25,22 @@ QString imagePath(const QString &file)
     return base + file;
 #endif
     return file;
+}
+
+QString selectVideo(QWidget *parent)
+{
+    return QFileDialog::getOpenFileName(
+        parent, QObject::tr("Select movie..."),
+        Preferences::instance().getValue("last_dir", QDir::homePath()).toString(),
+        VIDEO_FILTER);
+
+//    QFileDialog dialog(parent, QObject::tr("Select Video..."), QDir::homePath());
+//    dialog.setModal(true);
+//    dialog.setFileMode(QFileDialog::QFileDialog::ExistingFile);
+//    dialog.setViewMode(QFileDialog::Detail);
+//    dialog.setNameFilter(VIDEO_FILTER);
+//    dialog.exec();
+//    return dialog.selectedFiles().value(0);
 }
 
 }

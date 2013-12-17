@@ -9,12 +9,15 @@
 #define	SRC_UTILS_H
 
 #include <QString>
+class QWidget;
 
 namespace Utils {
 
 extern const QString APPLICATION_NAME;
 
 QString imagePath(const QString &file);
+
+QString selectVideo(QWidget *parent = 0);
 
 }
 

@@ -306,10 +306,11 @@ void MainWindow::hideEditor()
 
 void MainWindow::loadVideo()
 {
-    QString filename = QFileDialog::getOpenFileName(
-            this, tr("Select movie..."),
-            Preferences::instance().getValue("last_dir", QDir::homePath()).toString(),
-            tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv"));
+    QString filename = Utils::selectVideo(this);
+//    QString filename = QFileDialog::getOpenFileName(
+//            this, tr("Select movie..."),
+//            Preferences::instance().getValue("last_dir", QDir::homePath()).toString(),
+//            tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv"));
     if (filename.isEmpty() || !QFile::exists(filename)) {
         qDebug() << "no file selected, exit";
         return;

@@ -6,6 +6,7 @@
  */
 
 #include "openglwidget.h"
+#include <QDebug>
 #include <QThread>
 #include <QCoreApplication>
 #include <QWaitCondition>
@@ -78,6 +79,8 @@ bool OpenGLWidget::event(QEvent *event)
         m_contextMoved->wakeAll();
         return true;
     }
+    if (event->type() == 14)
+        return true;
     return QGLWidget::event(event);
 }
 
@@ -86,6 +89,7 @@ void OpenGLWidget::resizeGL(int width, int height)
     Q_UNUSED(width)
     Q_UNUSED(height)
     //QGLWidget::resizeGL(width, height);
+    qDebug() << "qDebug";
 }
 
 void OpenGLWidget::paintGL()
