@@ -5,12 +5,12 @@
  * Created on December 5, 2013, 3:42 PM
  */
 
-#include <QGuiApplication>
+//#include <QGuiApplication>
 #include <QApplication>
 #include <QString>
 #include <QFile>
 #include <QDebug>
-#include "openglwindow.h"
+//#include "openglwindow.h"
 #include "mainwindow.h"
 #include "preferences.h"
 
@@ -50,15 +50,16 @@ int main(int argc, char **argv)
     parseArgs(argc, argv);
 
     if (Preferences::instance().getViewMode() == Preferences::VIEW_MODE_WINDOWED) {
-        QSurfaceFormat format;
-        format.setSamples(4);
-        QGuiApplication app(argc, argv);
-        OpenGLWindow window;
-        window.setFormat(format);
-        window.resize(640, 480);
-        window.show();
-        return app.exec();
+//        QSurfaceFormat format;
+//        format.setSamples(4);
+//        QGuiApplication app(argc, argv);
+//        OpenGLWindow window;
+//        window.setFormat(format);
+//        window.resize(640, 480);
+//        window.show();
+//        return app.exec();
     } else {
+        QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
         QApplication app(argc, argv);
         MainWindow window;
         return app.exec();

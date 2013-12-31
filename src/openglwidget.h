@@ -42,28 +42,6 @@ public slots:
     virtual void swapBuffer();
     virtual void makeContextCurrent();
     virtual void getWindowSize(int *width, int *height);
-
-public:
-    static const QEvent::Type m_moveContextEvent;
-
-private:
-    QMutex *m_contextMovedLock;
-    QWaitCondition *m_contextMoved;
-    bool m_contextInMainThread;
 };
-
-class MoveContextEvent : public QEvent
-{
-public:
-    MoveContextEvent(QThread *destThread) :
-        QEvent(OpenGLWidget::m_moveContextEvent),
-        m_destThread(destThread)
-    {
-    }
-    QThread* getThread() const { return m_destThread; }
-private:
-    QThread *m_destThread;
-};
-
 
 #endif

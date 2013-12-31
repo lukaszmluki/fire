@@ -12,26 +12,17 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QPaintEvent>
-
-const QEvent::Type OpenGLWidget::m_moveContextEvent = static_cast<QEvent::Type>(QEvent::registerEventType());
+#include "playermanager.h"
+#include "ffengine.h"
 
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
-    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent),
-    m_contextMovedLock(new QMutex),
-    m_contextMoved(new QWaitCondition),
-    m_contextInMainThread(true)
+    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent)
 {
     setAutoFillBackground(false);
-    QGLWidget::makeCurrent();
-    QGLWidget::doneCurrent();
 }
 
 OpenGLWidget::~OpenGLWidget()
 {
-    m_contextMovedLock->lock();
-    if (!m_contextInMainThread)
-        m_contextMoved->wait(m_contextMovedLock);
-    m_contextMovedLock->unlock();
 }
 
 void OpenGLWidget::swapBuffer()
@@ -47,19 +38,10 @@ void OpenGLWidget::makeContextCurrent()
 
 void OpenGLWidget::moveContextToDeviceThread()
 {
-    m_contextMovedLock->lock();
-    QCoreApplication::postEvent(this, new MoveContextEvent(QThread::currentThread()));
-    m_contextMoved->wait(m_contextMovedLock);
-    m_contextMovedLock->unlock();
 }
 
 void OpenGLWidget::moveContextToMainThread()
 {
-    m_contextMovedLock->lock();
-    context()->moveToThread(thread());
-    m_contextInMainThread = true;
-    m_contextMovedLock->unlock();
-    m_contextMoved->wakeAll();
 }
 
 void OpenGLWidget::getWindowSize(int *width, int *height)
@@ -80,15 +62,6 @@ void OpenGLWidget::fillWithColor(const QColor &color)
 
 bool OpenGLWidget::event(QEvent *event)
 {
-    if (event->type() == m_moveContextEvent) {
-        MoveContextEvent *e = static_cast<MoveContextEvent *>(event);
-        m_contextMovedLock->lock();
-        context()->moveToThread(e->getThread());
-        m_contextInMainThread = false;
-        m_contextMovedLock->unlock();
-        m_contextMoved->wakeAll();
-        return true;
-    }
     return QGLWidget::event(event);
 }
 
@@ -99,7 +72,9 @@ void OpenGLWidget::resizeEvent(QResizeEvent *event)
 
 void OpenGLWidget::paintEvent(QPaintEvent *event)
 {
-    if (m_contextInMainThread)
+    if (PlayerManager::instance().getPlayer(this)->isMediaOpened())
+        ;//repaint
+    else
         fillWithColor();
     event->accept();
 }
