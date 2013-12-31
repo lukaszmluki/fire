@@ -98,7 +98,7 @@ MainWindow::MainWindow(QWidget *parent) :
         m_positionSlider->setRange(0, 0);
         m_positionSlider->setSliderPosition(0);
         connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
-	    hlayout->addWidget(m_positionSlider);
+        hlayout->addWidget(m_positionSlider);
 
     layout->addWidget(m_navigationPanel);
     m_splitterVideoEditor->addWidget(vbox);
@@ -241,6 +241,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    PlayerManager::instance().unregisterPlayer(m_videoArea);
 }
 
 QToolButton* MainWindow::addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout)
@@ -317,7 +318,7 @@ void MainWindow::loadVideo()
     }
     Preferences::instance().setLastDir(filename);
 
-    PlayerManager::instance().getPlayer(m_videoArea)->open(filename);
+    PlayerManager::instance().getPlayer(m_videoArea)->openMedia(filename);
 
 //    filename = filename.left(filename.lastIndexOf(".")) + "txt";
 //    if (QFile::exists(filename)) {
@@ -360,4 +361,9 @@ void MainWindow::positionChanged(double position)
 {
     if (!m_positionSlider->isSliderDown())
         m_positionSlider->setSliderPosition(position);
+}
+
+void MainWindow::positionSliderChanged(int position)
+{
+    PlayerManager::instance().getPlayer(m_videoArea)->seek(position);
 }

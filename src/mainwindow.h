@@ -52,6 +52,7 @@ private slots:
     void resumed();
     void durationChanged(double duration);
     void positionChanged(double position);
+    void positionSliderChanged(int position);
 
 protected:
     void resizeEvent(QResizeEvent *e);

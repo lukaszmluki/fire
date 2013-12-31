@@ -23,8 +23,8 @@ public:
     static PlayerManager& instance();
 
     FFEngine* registerPlayer(OpenGLDelegate *window);
-    bool unregister(OpenGLDelegate *window);
-    bool unregister(FFEngine *player);
+    bool unregisterPlayer(OpenGLDelegate *window);
+    bool unregisterPlayer(FFEngine *player);
 
     OpenGLDelegate* getWindow(FFEngine *player);
     FFEngine* getPlayer(OpenGLDelegate *window);

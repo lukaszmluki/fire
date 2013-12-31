@@ -22,7 +22,8 @@ public:
     FFEngine(const QString &videoDevice, const QString &audioDevice, QObject *parent = 0);
     virtual ~FFEngine();
 
-    bool open(const QString &media);
+    bool openMedia(const QString &media);
+    bool isMediaOpened() const;
 
 public slots:
     void togglePause();

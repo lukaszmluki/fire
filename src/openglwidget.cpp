@@ -18,7 +18,8 @@ const QEvent::Type OpenGLWidget::m_moveContextEvent = static_cast<QEvent::Type>(
 OpenGLWidget::OpenGLWidget(QWidget *parent) :
     QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent),
     m_contextMovedLock(new QMutex),
-    m_contextMoved(new QWaitCondition)
+    m_contextMoved(new QWaitCondition),
+    m_contextInMainThread(true)
 {
     setAutoFillBackground(false);
     QGLWidget::makeCurrent();
@@ -27,6 +28,10 @@ OpenGLWidget::OpenGLWidget(QWidget *parent) :
 
 OpenGLWidget::~OpenGLWidget()
 {
+    m_contextMovedLock->lock();
+    if (!m_contextInMainThread)
+        m_contextMoved->wait(m_contextMovedLock);
+    m_contextMovedLock->unlock();
 }
 
 void OpenGLWidget::swapBuffer()
@@ -50,7 +55,11 @@ void OpenGLWidget::moveContextToDeviceThread()
 
 void OpenGLWidget::moveContextToMainThread()
 {
+    m_contextMovedLock->lock();
     context()->moveToThread(thread());
+    m_contextInMainThread = true;
+    m_contextMovedLock->unlock();
+    m_contextMoved->wakeAll();
 }
 
 void OpenGLWidget::getWindowSize(int *width, int *height)
@@ -75,31 +84,23 @@ bool OpenGLWidget::event(QEvent *event)
         MoveContextEvent *e = static_cast<MoveContextEvent *>(event);
         m_contextMovedLock->lock();
         context()->moveToThread(e->getThread());
+        m_contextInMainThread = false;
         m_contextMovedLock->unlock();
         m_contextMoved->wakeAll();
         return true;
     }
-    if (event->type() == 14)
-        return true;
     return QGLWidget::event(event);
 }
 
-void OpenGLWidget::resizeGL(int width, int height)
+void OpenGLWidget::resizeEvent(QResizeEvent *event)
 {
-    Q_UNUSED(width)
-    Q_UNUSED(height)
-    //QGLWidget::resizeGL(width, height);
-    qDebug() << "qDebug";
-}
-
-void OpenGLWidget::paintGL()
-{
-    //QGLWidget::paintGL();
+    event->accept();
 }
 
 void OpenGLWidget::paintEvent(QPaintEvent *event)
 {
-    //fillWithColor();
-    //event->accept();
-    //QGLWidget::paintEvent(event);
+    if (m_contextInMainThread)
+        fillWithColor();
+    event->accept();
 }
+

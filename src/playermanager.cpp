@@ -53,16 +53,18 @@ FFEngine* PlayerManager::registerPlayer(OpenGLDelegate *window)
     return engine;
 }
 
-bool PlayerManager::unregister(OpenGLDelegate *window)
+bool PlayerManager::unregisterPlayer(OpenGLDelegate *window)
 {
+    delete m_players.value(window, NULL);
     return m_players.remove(window);
 }
 
-bool PlayerManager::unregister(FFEngine *player)
+bool PlayerManager::unregisterPlayer(FFEngine *player)
 {
     PlayersIterator it = m_players.begin();
     while (it != m_players.end()) {
         if (it.value() == player) {
+            delete player;
             m_players.erase(it);
             return true;
         }
@@ -78,5 +80,5 @@ OpenGLDelegate* PlayerManager::getWindow(FFEngine *player)
 
 FFEngine* PlayerManager::getPlayer(OpenGLDelegate *window)
 {
-    return m_players.value(window);
+    return m_players.value(window, NULL);
 }

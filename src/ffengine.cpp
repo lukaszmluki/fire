@@ -251,8 +251,10 @@ bool FFEngine::createContext()
     return true;
 }
 
-bool FFEngine::open(const QString &media)
+bool FFEngine::openMedia(const QString &media)
 {
+    if (m_AVEngineContext)
+        freeContext();
     if (!createContext()) {
         qDebug() << "Cannot allocate AVEngineContext";
         return false;
@@ -264,6 +266,15 @@ bool FFEngine::open(const QString &media)
     }
     return true;
 }
+
+bool FFEngine::isMediaOpened() const
+{
+    if (m_AVEngineContext) {
+        return avengine_is_media_opened(m_AVEngineContext);
+    }
+    return false;
+}
+
 
 void FFEngine::togglePause()
 {

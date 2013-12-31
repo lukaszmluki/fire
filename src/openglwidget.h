@@ -32,9 +32,8 @@ public:
 
 protected:
     virtual bool event(QEvent *event);
-    virtual void paintEvent(QPaintEvent * event);
-    virtual void paintGL();
-    virtual void resizeGL(int width, int height);
+    virtual void paintEvent(QPaintEvent *event);
+    virtual void resizeEvent(QResizeEvent *event);
 
 public slots:
     virtual void moveContextToDeviceThread();
@@ -50,6 +49,7 @@ public:
 private:
     QMutex *m_contextMovedLock;
     QWaitCondition *m_contextMoved;
+    bool m_contextInMainThread;
 };
 
 class MoveContextEvent : public QEvent

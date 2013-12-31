@@ -77,7 +77,7 @@ void OpenGLWindow::openSelectedFile()
 {
     QString file = Preferences::instance().getSelectedFile();
     if (!file.isEmpty()) {
-        PlayerManager::instance().getPlayer(this)->open(file);
+        PlayerManager::instance().getPlayer(this)->openMedia(file);
         setTitle(file);
     }
 }
