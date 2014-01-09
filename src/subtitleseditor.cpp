@@ -688,13 +688,15 @@ SubtitlesEditor::~SubtitlesEditor()
 //    else {
 //        stream << QString::number(time, 'g', 3) << "s";
 //    }
-//    stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << \
-//                "<font color=\"blue\">x</font>" << \
-//                cursorPosX << \
-//                "&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"blue\">y</font>" << \
-//                cursorPosY << \
-//                ":" << \
-//                linesCount;
+/*
+    stream << "&nbsp;&nbsp;&nbsp;&nbsp;" << \
+                "<font color=\"blue\">x</font>" << \
+                cursorPosX << \
+                "&nbsp;&nbsp;&nbsp;&nbsp;<font color=\"blue\">y</font>" << \
+                cursorPosY << \
+                ":" << \
+                linesCount;
+ */
 //    emit infoLineTextChanged(infoline);
 //    //Subtitles::instance().print();
 //}
