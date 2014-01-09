@@ -56,7 +56,6 @@ MainWindow::MainWindow(QWidget *parent) :
     hlayout->addStretch(1);
     m_videoLineInfo = new QLabel();
     hlayout->addWidget(m_videoLineInfo);
-    m_normalViewArea->layout()->addWidget(m_movieInfoLine);
 
 //create widget for the splitter (1)
     m_splitterVideoEditor = new QSplitter(Qt::Vertical);
@@ -121,6 +120,7 @@ MainWindow::MainWindow(QWidget *parent) :
     m_splitterVideoEditor->addWidget(m_subtitlesEditorBox);
 
     m_normalViewArea->layout()->addWidget(m_splitterVideoEditor);
+    m_normalViewArea->layout()->addWidget(m_movieInfoLine);
     setCentralWidget(m_normalViewArea);
 
 //TOOL BARS
@@ -308,10 +308,6 @@ void MainWindow::hideEditor()
 void MainWindow::loadVideo()
 {
     QString filename = Utils::selectVideo(this);
-//    QString filename = QFileDialog::getOpenFileName(
-//            this, tr("Select movie..."),
-//            Preferences::instance().getValue("last_dir", QDir::homePath()).toString(),
-//            tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv"));
     if (filename.isEmpty() || !QFile::exists(filename)) {
         qDebug() << "no file selected, exit";
         return;
