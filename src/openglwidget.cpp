@@ -31,30 +31,24 @@ void OpenGLWidget::swapBuffer()
     QGLWidget::doneCurrent();
 }
 
-void OpenGLWidget::makeContextCurrent()
+void OpenGLWidget::prepareBuffer()
 {
     QGLWidget::makeCurrent();
 }
 
-void OpenGLWidget::moveContextToDeviceThread()
+int OpenGLWidget::windowWidth()
 {
+    return QGLWidget::width();
 }
 
-void OpenGLWidget::moveContextToMainThread()
+int OpenGLWidget::windowHeight()
 {
-}
-
-void OpenGLWidget::getWindowSize(int *width, int *height)
-{
-    if (width)
-        *width = QGLWidget::width();
-    if (height)
-        *height = QGLWidget::height();
+    return QGLWidget::height();
 }
 
 void OpenGLWidget::fillWithColor(const QColor &color)
 {
-    makeCurrent();
+    QGLWidget::makeCurrent();
     qglClearColor(color);
     glClear(GL_COLOR_BUFFER_BIT);
     swapBuffer();
@@ -67,6 +61,7 @@ bool OpenGLWidget::event(QEvent *event)
 
 void OpenGLWidget::resizeEvent(QResizeEvent *event)
 {
+    PlayerManager::instance().getPlayer(this)->resize(event->size());
     event->accept();
 }
 

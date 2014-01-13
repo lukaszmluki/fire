@@ -14,6 +14,8 @@ extern "C" {
 #include <libavengine/avengine.h>
 }
 
+class QSize;
+
 class FFEngine : public QObject
 {
     Q_OBJECT
@@ -26,6 +28,7 @@ public:
     bool isMediaOpened() const;
 
 public slots:
+    void resize(const QSize &size);
     void togglePause();
     void pause();
     void resume();
@@ -33,13 +36,8 @@ public slots:
 
 signals:
     // OpenGL signals
-    void beforeWriteHeader();
-    void afterWriteHeader();
-    void beforeWritePacket();
-    void afterWritePacket();
-    void beforeWriteTrailer();
-    void afterWriteTrailer();
-    void getWindowSize(int *, int *);
+    void prepareBuffer();
+    void swapBuffer();
     // Player signals
     void finished();
     void paused();
@@ -50,21 +48,8 @@ signals:
 private:
     static int initializeFFmpeg();
 
-    // OpenGL device callbacks
-    static int staticBeforeWriteHeaderCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticAfterWriteHeaderCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticBeforeWritePacketCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticAfterWritePacketCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticBeforeWriteTrailerCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticAfterWriteTrailerCallback(struct AVFormatContext *ctx, void *extra);
-    static int staticWindowSizeCallback(struct AVFormatContext *ctx, int *width, int *height);
-    int beforeWriteHeaderCallback();
-    int afterWriteHeaderCallback();
-    int beforeWritePacketCallback();
-    int afterWritePacketCallback();
-    int beforeWriteTrailerCallback();
-    int afterWriteTrailerCallback();
-    int windowSizeCallback(int *width, int *height);
+    static int staticControlMessage(struct AVFormatContext *ctx, int type,
+                                    void *data, size_t size);
 
     // Player callbacks
     static void staticFinishedCallback(AVEngineContext *ctx);

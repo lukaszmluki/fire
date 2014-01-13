@@ -49,6 +49,8 @@ int main(int argc, char **argv)
 {
     parseArgs(argc, argv);
 
+    QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
+
     if (Preferences::instance().getViewMode() == Preferences::VIEW_MODE_WINDOWED) {
 //        QSurfaceFormat format;
 //        format.setSamples(4);
@@ -59,7 +61,6 @@ int main(int argc, char **argv)
 //        window.show();
 //        return app.exec();
     } else {
-        QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
         QApplication app(argc, argv);
         MainWindow window;
         return app.exec();

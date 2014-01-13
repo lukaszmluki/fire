@@ -36,12 +36,13 @@ protected:
     virtual void resizeEvent(QResizeEvent *event);
 
 public slots:
-    virtual void moveContextToDeviceThread();
-    virtual void moveContextToMainThread();
-    virtual void fillWithColor(const QColor &color = Qt::black);
     virtual void swapBuffer();
-    virtual void makeContextCurrent();
-    virtual void getWindowSize(int *width, int *height);
+    virtual void prepareBuffer();
+    virtual int windowWidth();
+    virtual int windowHeight();
+
+private:
+    void fillWithColor(const QColor &color = Qt::black);
 };
 
 #endif

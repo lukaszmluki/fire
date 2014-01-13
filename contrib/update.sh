@@ -20,7 +20,7 @@ fi
 pushd ffmpeg
 git fetch origin
 git checkout fire
-git reset --hard origin/fire
+git reset --hard origin/libavengine
 ./configure  --prefix=../../external \
              --disable-programs --disable-doc \
              --enable-libpulse \

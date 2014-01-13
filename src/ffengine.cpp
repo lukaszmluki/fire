@@ -10,8 +10,11 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 #include <libavfilter/avfilter.h>
 }
+#include <QSize>
 #include "ffengine.h"
 #include "systemdelegates.h"
+#include "playermanager.h"
+#include "opengldelegate.h"
 
 AVEngineCallback FFEngine::m_staticCallbacks;
 
@@ -49,93 +52,21 @@ FFEngine::~FFEngine()
     freeContext();
 }
 
-int FFEngine::staticBeforeWriteHeaderCallback(struct AVFormatContext *ctx, void *extra)
+int FFEngine::staticControlMessage(struct AVFormatContext *ctx, int type,
+                                   void *data, size_t size)
 {
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->beforeWriteHeaderCallback();
-}
-
-int FFEngine::staticAfterWriteHeaderCallback(struct AVFormatContext *ctx, void *extra)
-{
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->afterWriteHeaderCallback();
-}
-
-int FFEngine::staticBeforeWritePacketCallback(struct AVFormatContext *ctx, void *extra)
-{
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->beforeWritePacketCallback();
-}
-
-int FFEngine::staticAfterWritePacketCallback(struct AVFormatContext *ctx, void *extra)
-{
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->afterWritePacketCallback();
-}
-
-int FFEngine::staticBeforeWriteTrailerCallback(struct AVFormatContext *ctx, void *extra)
-{
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->beforeWriteTrailerCallback();
-}
-
-int FFEngine::staticAfterWriteTrailerCallback(struct AVFormatContext *ctx, void *extra)
-{
-    Q_UNUSED(extra);
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->afterWriteTrailerCallback();
-}
-
-int FFEngine::staticWindowSizeCallback(struct AVFormatContext *ctx, int *width, int *height)
-{
-    FFEngine *_this = static_cast<FFEngine *>(av_format_get_user_data(ctx));
-    return _this->windowSizeCallback(width, height);
-}
-
-int FFEngine::beforeWriteHeaderCallback()
-{
-    emit beforeWriteHeader();
-    return 0;
-}
-
-int FFEngine::afterWriteHeaderCallback()
-{
-    emit afterWriteHeader();
-    return 0;
-}
-
-int FFEngine::beforeWritePacketCallback()
-{
-    emit  beforeWritePacket();
-    return 0;
-}
-
-int FFEngine::afterWritePacketCallback()
-{
-    emit afterWritePacket();
-    return 0;
-}
-
-int FFEngine::beforeWriteTrailerCallback()
-{
-    emit beforeWriteTrailer();
-    return 0;
-}
-
-int FFEngine::afterWriteTrailerCallback()
-{
-    emit afterWriteTrailer();
-    return 0;
-}
-
-int FFEngine::windowSizeCallback(int *width, int *height)
-{
-    emit getWindowSize(width, height);
+    Q_UNUSED(data); Q_UNUSED(size);
+    FFEngine *_this = static_cast<FFEngine *>(av_format_get_opaque(ctx));
+    switch(static_cast<AVDevToAppMessageType>(type)) {
+    case AV_DEV_TO_APP_PREPARE_WINDOW_BUFFER:
+        _this->prepareBuffer();
+        break;
+    case AV_DEV_TO_APP_DISPLAY_WINDOW_BUFFER:
+        _this->swapBuffer();
+        break;
+    default:
+        break;
+    }
     return 0;
 }
 
@@ -207,20 +138,18 @@ void FFEngine::durationChanged()
 
 void FFEngine::audioOutputContextCreatedCallback(AVFormatContext *actx)
 {
-    av_format_set_user_data(actx, this);
+    av_format_set_opaque(actx, this);
 }
 
 void FFEngine::videoOutputContextCreatedCallback(AVFormatContext *vctx)
 {
-    //TODO: this should be done by engine API
-    av_format_set_user_data(vctx, this);
-    av_format_set_before_write_header_cb(vctx, staticBeforeWriteHeaderCallback);
-    av_format_set_after_write_header_cb(vctx, staticAfterWriteHeaderCallback);
-    av_format_set_before_write_packet_cb(vctx, staticBeforeWritePacketCallback);
-    av_format_set_after_write_packet_cb(vctx, staticAfterWritePacketCallback);
-    av_format_set_before_write_trailer_cb(vctx, staticBeforeWriteTrailerCallback);
-    av_format_set_after_write_trailer_cb(vctx, staticAfterWriteTrailerCallback);
-    av_format_set_window_size_cb(vctx, staticWindowSizeCallback);
+    av_format_set_opaque(vctx, this);
+    av_format_set_control_message_cb(vctx, staticControlMessage);
+    AVDeviceRect message;
+    message.x = message.y = 0;
+    message.height = PlayerManager::instance().getWindow(this)->windowHeight();
+    message.width = PlayerManager::instance().getWindow(this)->windowWidth();
+    avdevice_app_to_dev_control_message(vctx, AV_APP_TO_DEV_WINDOW_SIZE, &message, sizeof(AVDeviceRect));
 }
 
 void FFEngine::freeContext()
@@ -232,7 +161,7 @@ void FFEngine::freeContext()
 bool FFEngine::createContext()
 {
     AVOutputFormat *audio_output = av_guess_format(m_audioDevice.toUtf8().constData(), NULL, NULL);
-    AVOutputFormat *video_output = av_guess_format(m_videoDevice.toUtf8().constData(), NULL, NULL);;
+    AVOutputFormat *video_output = av_guess_format(m_videoDevice.toUtf8().constData(), NULL, NULL);
     if (!video_output || !audio_output) {
         qDebug() << "Device not found";
         return false;
@@ -275,6 +204,11 @@ bool FFEngine::isMediaOpened() const
     return false;
 }
 
+void FFEngine::resize(const QSize &size)
+{
+    if (m_AVEngineContext)
+        avengine_resize(m_AVEngineContext, size.width(), size.height());
+}
 
 void FFEngine::togglePause()
 {
