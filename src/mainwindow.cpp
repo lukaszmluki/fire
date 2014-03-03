@@ -24,7 +24,7 @@
 #include <QSlider>
 #include <QFileDialog>
 #include <QDir>
-#include "utils.h"
+#include "common.h"
 #include "preferences.h"
 #include "openglwidget.h"
 #include "subtitleseditor.h"

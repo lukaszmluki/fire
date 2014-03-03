@@ -5,7 +5,7 @@
  * Created on December 11, 2013, 12:09 AM
  */
 
-#include "utils.h"
+#include "common.h"
 #include <QFileDialog>
 #include <QDir>
 #include "preferences.h"
