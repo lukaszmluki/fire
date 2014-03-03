@@ -2,8 +2,5 @@
 Makefile
 /moc/
 /obj/
-/contrib/*
-!/contrib/update.sh
-!/contrib/libavengine
 /external/lib/*
 /external/include/*

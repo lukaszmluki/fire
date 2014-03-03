@@ -1,3 +1,6 @@
 [submodule "contrib/libavengine"]
 	path = contrib/libavengine
 	url = ssh://git@htpc:443/home/git/libavengine/
+[submodule "contrib/ffmpeg"]
+	path = contrib/ffmpeg
+	url = ssh://git@htpc:443/home/git/ffmpeg
