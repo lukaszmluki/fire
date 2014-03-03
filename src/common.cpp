@@ -13,7 +13,7 @@
 namespace Utils {
 
 const QString APPLICATION_NAME("Fire Player");
-const QString VIDEO_FILTER = QObject::tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv");
+const QString VIDEO_FILTER = QObject::tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv;;All files (*.*)");
 
 QString imagePath(const QString &file)
 {
