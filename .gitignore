@@ -4,5 +4,6 @@ Makefile
 /obj/
 /contrib/*
 !/contrib/update.sh
+!/contrib/libavengine
 /external/lib/*
 /external/include/*

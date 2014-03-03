@@ -1,0 +1,3 @@
+[submodule "contrib/libavengine"]
+	path = contrib/libavengine
+	url = ssh://git@htpc:443/home/git/libavengine/
