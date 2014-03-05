@@ -34,6 +34,7 @@ SOURCES += src/main.cpp \
            contrib/libavengine/system_delegate.c \
            contrib/libavengine/utils.c \
            contrib/libavengine/video.c \
+           contrib/libavengine/event_loop.c
 
 HEADERS += \
 #           src/openglwindow.h \
