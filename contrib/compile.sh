@@ -11,6 +11,8 @@ if [ $1="debug" ]; then
    FFMPEG_DEBUG="--enable-debug=3 --disable-optimizations --disable-stripping"
 fi
 
+rm -rf ../external
+
 pushd ffmpeg
 ./configure  --prefix=../../external \
              --disable-programs --disable-doc \
