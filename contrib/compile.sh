@@ -16,6 +16,7 @@ rm -rf ../external
 pushd ffmpeg
 ./configure  --prefix=../../external \
              --disable-programs --disable-doc \
+             --build-suffix=fire \
              --enable-libpulse \
              --enable-libssh \
              --enable-opengl \

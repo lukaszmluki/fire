@@ -10,7 +10,7 @@ QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
 
 INCLUDEPATH += ./external/include/
 
-LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --libs libavdevice libavutil libavcodec libavfilter`
+LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --libs libavdevicefire libavutilfire libavcodecfire libavfilterfire`
 
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
