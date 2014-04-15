@@ -64,6 +64,12 @@ int FFEngine::staticControlMessage(struct AVFormatContext *ctx, int type,
     case AV_DEV_TO_APP_DISPLAY_WINDOW_BUFFER:
         _this->swapBuffer();
         break;
+    case AV_DEV_TO_APP_MUTE_STATE_CHANGED:
+        _this->muteChanged(*static_cast<int *>(data));
+        break;
+    case AV_DEV_TO_APP_VOLUME_LEVEL_CHANGED:
+        _this->volumeChanged(*static_cast<double *>(data));
+        break;
     default:
         break;
     }
@@ -139,6 +145,7 @@ void FFEngine::durationChanged()
 void FFEngine::audioOutputContextCreatedCallback(AVFormatContext *actx)
 {
     av_format_set_opaque(actx, this);
+    av_format_set_control_message_cb(actx, staticControlMessage);
 }
 
 void FFEngine::videoOutputContextCreatedCallback(AVFormatContext *vctx)
@@ -204,6 +211,19 @@ bool FFEngine::isMediaOpened() const
     return false;
 }
 
+bool FFEngine::addGuiDelegate(GuiDelegate *guiDelegate)
+{
+    QObject *qo = dynamic_cast<QObject *>(guiDelegate);
+    if (!qo) {
+        qCritical("guiDelegate is not QObject");
+        return false;
+    }
+
+    QObject::connect(this, SIGNAL(volumeChanged(double)), qo, SLOT(volumeChanged(double)));
+    QObject::connect(this, SIGNAL(muteChanged(int)), qo, SLOT(muteChanged(int)));
+    return true;
+}
+
 void FFEngine::resize(const QSize &size)
 {
     if (m_AVEngineContext)
@@ -232,4 +252,16 @@ void FFEngine::seek(double seconds)
 {
     if (m_AVEngineContext)
         avengine_seek(m_AVEngineContext, seconds);
+}
+
+void FFEngine::setVolume(double volume)
+{
+    if (m_AVEngineContext)
+        avengine_set_volume(m_AVEngineContext, volume);
+}
+
+void FFEngine::toggleMute()
+{
+    if (m_AVEngineContext)
+        avengine_toggle_mute(m_AVEngineContext);
 }

@@ -13,6 +13,7 @@
 extern "C" {
 #include <libavengine/avengine.h>
 }
+#include "guidelegate.h"
 
 class QSize;
 
@@ -27,17 +28,24 @@ public:
     bool openMedia(const QString &media);
     bool isMediaOpened() const;
 
+    bool addGuiDelegate(GuiDelegate *guiDelegate);
+
 public slots:
     void resize(const QSize &size);
     void togglePause();
     void pause();
     void resume();
     void seek(double seconds);
+    void setVolume(double volume);
+    void toggleMute();
 
 signals:
     // OpenGL signals
     void prepareBuffer();
     void swapBuffer();
+    // Audio device signals
+    void volumeChanged(double volume);
+    void muteChanged(int mute);
     // Player signals
     void finished();
     void paused();

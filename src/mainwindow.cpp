@@ -83,13 +83,19 @@ MainWindow::MainWindow(QWidget *parent) :
         addNavigationButton("navigation/previous.bmp", SLOT(previous()), hlayout);
         addNavigationButton("navigation/next.bmp", SLOT(next()), hlayout);
         hlayout->addSpacing(20);
-        QSlider *volume = new QSlider(Qt::Horizontal);
-        volume->setFocusPolicy(Qt::NoFocus);
-        volume->setRange(0, 100);
-        volume->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
-        volume->setMaximumWidth(100);
-        connect(volume, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
-        hlayout->addWidget(volume);
+        m_volumeSlider = new QSlider(Qt::Horizontal);
+        m_volumeSlider->setFocusPolicy(Qt::NoFocus);
+        m_volumeSlider->setRange(0, 100);
+        m_volumeSlider->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
+        m_volumeSlider->setMaximumWidth(100);
+        connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
+        QToolButton *mute = new QToolButton();
+        mute->setText("M");
+        mute->setMaximumWidth(20);
+        connect(mute, SIGNAL(clicked()), this, SLOT(muteButtonClicked()));
+        hlayout->addWidget(mute);
+        hlayout->addSpacing(10);
+        hlayout->addWidget(m_volumeSlider);
         hlayout->addSpacing(20);
         m_positionSlider = new QSlider(Qt::Horizontal);
         m_positionSlider->setTracking(false);
@@ -222,6 +228,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(player, SIGNAL(resumed()), this, SLOT(resumed()));
     connect(player, SIGNAL(durationChanged(double)), this, SLOT(durationChanged(double)));
     connect(player, SIGNAL(positionChanged(double)), this, SLOT(positionChanged(double)));
+    player->addGuiDelegate(this);
 
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));
 //    connect(m_subtitlesEditor, SIGNAL(infoLineTextChanged(const QString&)), this, SLOT(changeEditorInfoLine(const QString&)));
@@ -362,4 +369,26 @@ void MainWindow::positionChanged(double position)
 void MainWindow::positionSliderChanged(int position)
 {
     PlayerManager::instance().getPlayer(m_videoArea)->seek(position);
+}
+
+void MainWindow::volumeSliderChanged(int volume)
+{
+    if (m_volumeSlider->isSliderDown())
+        PlayerManager::instance().getPlayer(m_videoArea)->setVolume(static_cast<double>(volume) / 100.0);
+}
+
+void MainWindow::muteButtonClicked()
+{
+    PlayerManager::instance().getPlayer(m_videoArea)->toggleMute();
+}
+
+void MainWindow::muteChanged(int mute)
+{
+    qDebug() << "muteChanged outside" << mute;
+}
+
+void MainWindow::volumeChanged(double volume)
+{
+    if (!m_volumeSlider->isSliderDown())
+        m_volumeSlider->setSliderPosition(volume * 100);
 }

@@ -10,6 +10,7 @@
 
 #include <QMainWindow>
 #include "opengldelegate.h"
+#include "guidelegate.h"
 
 class OpenGLWidget;
 class SubtitlesEditor;
@@ -26,7 +27,7 @@ class QSlider;
 class QSplitter;
 class QToolButton;
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public GuiDelegate
 {
     Q_OBJECT
     Q_DISABLE_COPY(MainWindow)
@@ -46,6 +47,8 @@ public slots:
     void closeVideo();
     void showEditor();
     void hideEditor();
+    void muteChanged(int mute);
+    void volumeChanged(double volume);
 
 private slots:
     void paused();
@@ -53,6 +56,8 @@ private slots:
     void durationChanged(double duration);
     void positionChanged(double position);
     void positionSliderChanged(int position);
+    void volumeSliderChanged(int volume);
+    void muteButtonClicked();
 
 protected:
     void resizeEvent(QResizeEvent *e);
@@ -80,6 +85,7 @@ private:
     SubtitlesEditor *m_subtitlesEditor;
     QSplitter *m_splitterVideoEditor;
     QToolButton *m_playButton;
+    QSlider *m_volumeSlider;
 };
 
 #endif	/* SRC_MAINWINDOW_H */
