@@ -47,14 +47,16 @@ public slots:
     void closeVideo();
     void showEditor();
     void hideEditor();
-    void muteChanged(int mute);
-    void volumeChanged(double volume);
 
 private slots:
-    void paused();
-    void resumed();
+    /* gui delegate */
     void durationChanged(double duration);
     void positionChanged(double position);
+    void muteChanged(int mute);
+    void volumeChanged(double volume);
+    void paused();
+    void resumed();
+    /* private */
     void positionSliderChanged(int position);
     void volumeSliderChanged(int volume);
     void muteButtonClicked();

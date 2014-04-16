@@ -219,8 +219,14 @@ bool FFEngine::addGuiDelegate(GuiDelegate *guiDelegate)
         return false;
     }
 
-    QObject::connect(this, SIGNAL(volumeChanged(double)), qo, SLOT(volumeChanged(double)));
-    QObject::connect(this, SIGNAL(muteChanged(int)), qo, SLOT(muteChanged(int)));
+    QObject::connect(this, SIGNAL(volumeChanged(double)),   qo, SLOT(volumeChanged(double)));
+    QObject::connect(this, SIGNAL(muteChanged(int)),        qo, SLOT(muteChanged(int)));
+    QObject::connect(this, SIGNAL(durationChanged(double)), qo, SLOT(durationChanged(double)));
+    QObject::connect(this, SIGNAL(positionChanged(double)), qo, SLOT(positionChanged(double)));
+    QObject::connect(this, SIGNAL(paused()),                qo, SLOT(paused()));
+    QObject::connect(this, SIGNAL(resumed()),               qo, SLOT(resumed()));
+
+
     return true;
 }
 

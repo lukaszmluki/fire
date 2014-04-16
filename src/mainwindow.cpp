@@ -224,10 +224,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
 //register player
     FFEngine *player = PlayerManager::instance().registerPlayer(m_videoArea);
-    connect(player, SIGNAL(paused()), this, SLOT(paused()));
-    connect(player, SIGNAL(resumed()), this, SLOT(resumed()));
-    connect(player, SIGNAL(durationChanged(double)), this, SLOT(durationChanged(double)));
-    connect(player, SIGNAL(positionChanged(double)), this, SLOT(positionChanged(double)));
     player->addGuiDelegate(this);
 
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));

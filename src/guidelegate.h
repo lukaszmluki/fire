@@ -13,6 +13,10 @@ class GuiDelegate
 public:
     virtual void muteChanged(int mute) = 0;
     virtual void volumeChanged(double volume) = 0;
+    virtual void durationChanged(double duration) = 0;
+    virtual void positionChanged(double position) = 0;
+    virtual void paused() = 0;
+    virtual void resumed() = 0;
 };
 
 
