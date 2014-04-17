@@ -5,9 +5,12 @@
  * Created on December 12, 2013, 12:09 PM
  */
 
+#include <QDebug>
+#include <QWidget>
 #include "playermanager.h"
 #include "ffengine.h"
 #include "videowidget.h"
+#include "preferences.h"
 
 PlayerManager::PlayerManager()
 {
@@ -34,7 +37,26 @@ FFEngine* PlayerManager::registerPlayer(VideoWidget *window)
         return NULL;
     }
 
-    FFEngine *engine = new FFEngine("opengl", "pulse", qo);
+    QString videoDevice;
+    QString audioDevice("pulse");
+    FFEngine::DeviceOptions videoOptions;
+    FFEngine::DeviceOptions audioOptions;
+    Preferences::RenderingEngine renderingEngine = Preferences::instance().getRenderingEngine();
+    if (renderingEngine == Preferences::RENDERING_ENGINE_OPENGL) {
+        videoOptions["no_window"] = "1";
+        videoDevice = "opengl";
+    } else if (renderingEngine == Preferences::RENDERING_ENGINE_X11) {
+        videoOptions["window_id"] = QString::number(dynamic_cast<QWidget *>(window)->winId());
+        videoDevice = "xv";
+    } else {
+        qCritical() << "Not supported engine";
+        return NULL;
+    }
+
+    qDebug() << videoOptions;
+    qDebug() << audioOptions;
+
+    FFEngine *engine = new FFEngine(videoDevice, audioDevice, videoOptions, audioOptions, qo);
 
     m_players.insert(window, engine);
 

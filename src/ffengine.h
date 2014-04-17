@@ -10,19 +10,25 @@
 
 #include <QObject>
 #include <QString>
+#include <QMap>
 extern "C" {
 #include <libavengine/avengine.h>
 }
 #include "guidelegate.h"
 
 class QSize;
+class QRect;
 
 class FFEngine : public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(FFEngine)
 public:
-    FFEngine(const QString &videoDevice, const QString &audioDevice, QObject *parent = 0);
+    typedef QMap<QString, QString> DeviceOptions;
+
+    FFEngine(const QString &videoDevice, const QString &audioDevice,
+             const DeviceOptions &videoOptions, const DeviceOptions &audioOptions,
+             QObject *parent = 0);
     virtual ~FFEngine();
 
     bool openMedia(const QString &media);
@@ -32,6 +38,7 @@ public:
 
 public slots:
     void resize(const QSize &size);
+    void repaint(const QRect &area);
     void togglePause();
     void pause();
     void resume();
@@ -80,6 +87,8 @@ private:
     AVEngineContext *m_AVEngineContext;
     QString m_videoDevice;
     QString m_audioDevice;
+    DeviceOptions m_videoOptions;
+    DeviceOptions m_audioOptions;
 };
 
 #endif	/* SRC_FFENGINE_H */

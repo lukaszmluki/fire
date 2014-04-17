@@ -25,6 +25,7 @@ SOURCES += src/main.cpp \
            src/openglwidget.cpp \
            src/playermanager.cpp \
            src/subtitleseditor.cpp \
+           src/x11widget.cpp \
            contrib/libavengine/audio.c \
            contrib/libavengine/avengine.c \
            contrib/libavengine/avengine_context.c \
@@ -47,4 +48,5 @@ HEADERS += \
            src/videowidget.h \
            src/openglwidget.h \
            src/playermanager.h \
-           src/subtitleseditor.h
+           src/subtitleseditor.h \
+           src/x11widget.h

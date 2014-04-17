@@ -27,6 +27,7 @@
 #include "common.h"
 #include "preferences.h"
 #include "openglwidget.h"
+#include "x11widget.h"
 #include "subtitleseditor.h"
 #include "playermanager.h"
 #include "ffengine.h"
@@ -65,7 +66,19 @@ MainWindow::MainWindow(QWidget *parent) :
     QWidget *vbox = new QWidget();
     vbox->setLayout(layout);
 
-    m_videoArea = new OpenGLWidget();
+    Preferences::RenderingEngine renderingEngine = Preferences::instance().getRenderingEngine();
+
+    if (renderingEngine == Preferences::RENDERING_ENGINE_OPENGL) {
+        m_videoArea = new OpenGLWidget();
+    } else if (renderingEngine == Preferences::RENDERING_ENGINE_X11) {
+        m_videoArea = new X11Widget();
+    }
+
+    if (m_videoArea)
+        qDebug() << "using engine: " << m_videoArea->engineName();
+    else
+        qCritical() << "No rendering engine available";
+
     QWidget *videoWidget = dynamic_cast<QWidget *>(m_videoArea);
     if (videoWidget) {
         videoWidget->setMinimumSize(100,100);

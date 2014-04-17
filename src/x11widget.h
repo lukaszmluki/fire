@@ -1,27 +1,27 @@
 /*
- * File:   openglwidget.h
+ * File:   x11widget.h
  * Author: Lukasz Marek
  *
- * Created on December 12, 2013, 10:08 PM
+ * Created on April 17, 2013, 10:08 PM
  */
 
-#ifndef SRC_OPENGL_WIDGET_H
-#define SRC_OPENGL_WIDGET_H
+#ifndef SRC_X11_WIDGET_H
+#define SRC_X11_WIDGET_H
 
-#include <QGLWidget>
+#include <QWidget>
 #include <QEvent>
 #include "videowidget.h"
 
 class QResizeEvent;
 class QPaintEvent;
 
-class OpenGLWidget : public QGLWidget, public VideoWidget
+class X11Widget : public QWidget, public VideoWidget
 {
     Q_OBJECT
-    Q_DISABLE_COPY(OpenGLWidget)
+    Q_DISABLE_COPY(X11Widget)
 public:
-    OpenGLWidget(QWidget *parent = 0);
-    ~OpenGLWidget();
+    X11Widget(QWidget *parent = 0);
+    ~X11Widget();
 
 protected:
     bool event(QEvent *event);
@@ -41,4 +41,4 @@ private:
     void fillWithColor(const QColor &color = Qt::black);
 };
 
-#endif /* SRC_OPENGL_WIDGET_H */
+#endif /* SRC_X11_WIDGET_H */

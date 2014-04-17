@@ -27,7 +27,8 @@ make distclean
              --disable-encoders \
              --disable-bsfs \
              --disable-indevs \
-             --disable-outdev=xv \
+             --disable-outdev=oss \
+             --disable-outdev=v4l2 \
              --disable-outdev=sdl \
              --disable-outdev=fbdev \
              --enable-indev=lavfi \
@@ -59,5 +60,3 @@ make -j16
 make install
 popd
 
-mkdir -p ../external/include/libavengine
-cp libavengine/*.h ../external/include/libavengine

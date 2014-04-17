@@ -11,6 +11,7 @@ extern "C" {
 #include <libavfilter/avfilter.h>
 }
 #include <QSize>
+#include <QRect>
 #include "ffengine.h"
 #include "systemdelegates.h"
 #include "playermanager.h"
@@ -37,11 +38,15 @@ int FFEngine::initializeFFmpeg()
     return 1;
 }
 
-FFEngine::FFEngine(const QString &videoDevice, const QString &audioDevice, QObject *parent) :
+FFEngine::FFEngine(const QString &videoDevice, const QString &audioDevice,
+                   const DeviceOptions &videoOptions, const DeviceOptions &audioOptions,
+                   QObject *parent) :
     QObject(parent),
     m_AVEngineContext(NULL),
     m_videoDevice(videoDevice),
-    m_audioDevice(audioDevice)
+    m_audioDevice(audioDevice),
+    m_videoOptions(videoOptions),
+    m_audioOptions(audioOptions)
 {
     static int init = initializeFFmpeg();
     Q_UNUSED(init)
@@ -178,9 +183,15 @@ bool FFEngine::createContext()
         qDebug() << "Allocated context is NULL";
         return false;
     }
+
+    DeviceOptions::const_iterator it;
     AVDictionary *opts = NULL;
-    av_dict_set(&opts, "no_window", "1", 0);
-    avengine_context_set_audio_output(m_AVEngineContext, audio_output, NULL, 0);
+    for (it = m_audioOptions.begin(); it != m_audioOptions.end(); ++it)
+        av_dict_set(&opts, it.key().toUtf8().constData(), it.value().toUtf8().constData(), 0);
+    avengine_context_set_audio_output(m_AVEngineContext, audio_output, opts, 1);
+    opts = NULL;
+    for (it = m_videoOptions.begin(); it != m_videoOptions.end(); ++it)
+        av_dict_set(&opts, it.key().toUtf8().constData(), it.value().toUtf8().constData(), 0);
     avengine_context_set_video_output(m_AVEngineContext, video_output, opts, 1);
     avengine_context_set_user_data(m_AVEngineContext, this);
     avengine_context_set_player_callbacks(m_AVEngineContext, &m_staticCallbacks);
@@ -226,7 +237,6 @@ bool FFEngine::addGuiDelegate(GuiDelegate *guiDelegate)
     QObject::connect(this, SIGNAL(paused()),                qo, SLOT(paused()));
     QObject::connect(this, SIGNAL(resumed()),               qo, SLOT(resumed()));
 
-
     return true;
 }
 
@@ -234,6 +244,12 @@ void FFEngine::resize(const QSize &size)
 {
     if (m_AVEngineContext)
         avengine_resize(m_AVEngineContext, size.width(), size.height());
+}
+
+void FFEngine::repaint(const QRect &area)
+{
+    if (m_AVEngineContext)
+        avengine_repaint(m_AVEngineContext, area.x(), area.y(), area.width(), area.height());
 }
 
 void FFEngine::togglePause()

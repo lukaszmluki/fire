@@ -67,10 +67,12 @@ void OpenGLWidget::resizeEvent(QResizeEvent *event)
 
 void OpenGLWidget::paintEvent(QPaintEvent *event)
 {
-    if (PlayerManager::instance().getPlayer(this)->isMediaOpened())
-        ;//repaint
-    else
+    if (!PlayerManager::instance().getPlayer(this)->isMediaOpened())
         fillWithColor();
     event->accept();
 }
 
+QString OpenGLWidget::engineName()
+{
+    return QString("OpenGL");
+}
