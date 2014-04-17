@@ -66,8 +66,13 @@ MainWindow::MainWindow(QWidget *parent) :
     vbox->setLayout(layout);
 
     m_videoArea = new OpenGLWidget();
-    m_videoArea->setMinimumSize(100,100);
-    layout->addWidget(m_videoArea);
+    QWidget *videoWidget = dynamic_cast<QWidget *>(m_videoArea);
+    if (videoWidget) {
+        videoWidget->setMinimumSize(100,100);
+        layout->addWidget(videoWidget);
+    } else {
+        qDebug() << "Cannot cast m_videoArea to QWidget";
+    }
 
     hlayout = new QHBoxLayout();
     hlayout->setSpacing(5);

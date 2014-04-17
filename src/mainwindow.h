@@ -10,6 +10,7 @@
 
 #include <QMainWindow>
 #include "guidelegate.h"
+#include "videowidget.h"
 
 class OpenGLWidget;
 class SubtitlesEditor;
@@ -82,7 +83,7 @@ private:
     QActionGroup *m_audioStreamsGroup;
     QToolBar *m_fileToolBar;
     QSlider *m_positionSlider;
-    OpenGLWidget *m_videoArea;
+    VideoWidget *m_videoArea;
     SubtitlesEditor *m_subtitlesEditor;
     QSplitter *m_splitterVideoEditor;
     QToolButton *m_playButton;
