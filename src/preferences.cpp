@@ -66,6 +66,11 @@ const QString& Preferences::getSelectedFile() const
     return m_selectedFile;
 }
 
+Preferences::RenderingEngine Preferences::getRenderingEngine() const
+{
+    return RENDERING_ENGINE_OPENGL;
+}
+
 void Preferences::createDefaultConfig()
 {
     setValue("last_dir", QDir::homePath());

@@ -30,6 +30,11 @@ public:
         VIEW_MODE_GUI        //full GUI
     };
 
+    enum RenderingEngine {
+        RENDERING_ENGINE_OPENGL,
+        RENDERING_ENGINE_X11
+    };
+
     static Preferences& instance();
 
     void setValue(const QString &key, const QVariant &value, bool apply = true);
@@ -38,6 +43,7 @@ public:
     void setLastDir(const QString &dir);
     void setViewMode(ViewMode viewMode);
     ViewMode getViewMode() const;
+    RenderingEngine getRenderingEngine() const;
     void setSelectedFile(const QString &file);
     const QString& getSelectedFile() const;
     QFont getDefaultFontEditor() const;
