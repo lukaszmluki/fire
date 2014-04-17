@@ -7,7 +7,7 @@
 
 #include "playermanager.h"
 #include "ffengine.h"
-#include "opengldelegate.h"
+#include "videowidget.h"
 
 PlayerManager::PlayerManager()
 {
@@ -23,7 +23,7 @@ PlayerManager& PlayerManager::instance()
     return instance;
 }
 
-FFEngine* PlayerManager::registerPlayer(OpenGLDelegate *window)
+FFEngine* PlayerManager::registerPlayer(VideoWidget *window)
 {
     if (m_players.contains(window))
         return getPlayer(window);
@@ -44,7 +44,7 @@ FFEngine* PlayerManager::registerPlayer(OpenGLDelegate *window)
     return engine;
 }
 
-bool PlayerManager::unregisterPlayer(OpenGLDelegate *window)
+bool PlayerManager::unregisterPlayer(VideoWidget *window)
 {
     delete m_players.value(window, NULL);
     return m_players.remove(window);
@@ -64,12 +64,12 @@ bool PlayerManager::unregisterPlayer(FFEngine *player)
     return false;
 }
 
-OpenGLDelegate* PlayerManager::getWindow(FFEngine *player)
+VideoWidget* PlayerManager::getWindow(FFEngine *player)
 {
     return m_players.key(player);
 }
 
-FFEngine* PlayerManager::getPlayer(OpenGLDelegate *window)
+FFEngine* PlayerManager::getPlayer(VideoWidget *window)
 {
     return m_players.value(window, NULL);
 }

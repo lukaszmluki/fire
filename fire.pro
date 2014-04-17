@@ -44,7 +44,7 @@ HEADERS += \
            src/preferences.h \
            src/mainwindow.h \
            src/common.h \
-           src/opengldelegate.h \
+           src/videowidget.h \
            src/openglwidget.h \
            src/playermanager.h \
            src/subtitleseditor.h

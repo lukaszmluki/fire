@@ -9,7 +9,6 @@
 #define	SRC_MAINWINDOW_H
 
 #include <QMainWindow>
-#include "opengldelegate.h"
 #include "guidelegate.h"
 
 class OpenGLWidget;

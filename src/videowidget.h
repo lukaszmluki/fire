@@ -5,12 +5,12 @@
  * Created on December 12, 2013, 10:42 AM
  */
 
-#ifndef SRC_OPENGL_DELEGATE_H
-#define SRC_OPENGL_DELEGATE_H
+#ifndef SRC_VIDEO_WIDGET_H
+#define SRC_VIDEO_WIDGET_H
 
 #include <QColor>
 
-class OpenGLDelegate
+class VideoWidget
 {
 public:
     virtual void prepareBuffer() = 0;
@@ -19,4 +19,4 @@ public:
     virtual int windowHeight() = 0;
 };
 
-#endif /* SRC_OPENGL_DELEGATE_H */
+#endif /* SRC_VIDEO_WIDGET_H */

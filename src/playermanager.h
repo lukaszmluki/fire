@@ -10,7 +10,7 @@
 
 #include <QMap>
 
-class OpenGLDelegate;
+class VideoWidget;
 class FFEngine;
 
 class PlayerManager
@@ -22,15 +22,15 @@ class PlayerManager
 public:
     static PlayerManager& instance();
 
-    FFEngine* registerPlayer(OpenGLDelegate *window);
-    bool unregisterPlayer(OpenGLDelegate *window);
+    FFEngine* registerPlayer(VideoWidget *window);
+    bool unregisterPlayer(VideoWidget *window);
     bool unregisterPlayer(FFEngine *player);
 
-    OpenGLDelegate* getWindow(FFEngine *player);
-    FFEngine* getPlayer(OpenGLDelegate *window);
+    VideoWidget* getWindow(FFEngine *player);
+    FFEngine* getPlayer(VideoWidget *window);
 
 private:
-    typedef QMap<OpenGLDelegate *, FFEngine *> PlayersList;
+    typedef QMap<VideoWidget *, FFEngine *> PlayersList;
     typedef PlayersList::iterator PlayersIterator;
     PlayersList m_players;
 };

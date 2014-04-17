@@ -10,7 +10,7 @@
 
 #include <QGLWidget>
 #include <QEvent>
-#include "opengldelegate.h"
+#include "videowidget.h"
 
 class QSize;
 class QResizeEvent;
@@ -22,7 +22,7 @@ class QThread;
 class QWaitCondition;
 class QMutex;
 
-class OpenGLWidget : public QGLWidget, public OpenGLDelegate
+class OpenGLWidget : public QGLWidget, public VideoWidget
 {
     Q_OBJECT
     Q_DISABLE_COPY(OpenGLWidget)

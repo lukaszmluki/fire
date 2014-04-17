@@ -14,7 +14,7 @@ extern "C" {
 #include "ffengine.h"
 #include "systemdelegates.h"
 #include "playermanager.h"
-#include "opengldelegate.h"
+#include "videowidget.h"
 
 AVEngineCallback FFEngine::m_staticCallbacks;
 
