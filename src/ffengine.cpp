@@ -13,7 +13,6 @@ extern "C" {
 #include <QSize>
 #include <QRect>
 #include "ffengine.h"
-#include "systemdelegates.h"
 #include "playermanager.h"
 #include "videowidget.h"
 

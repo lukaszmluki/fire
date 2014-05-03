@@ -18,7 +18,6 @@ OBJECTS_DIR = ./obj
 SOURCES += src/main.cpp \
 #           src/openglwindow.cpp \
            src/ffengine.cpp \
-           src/systemdelegates.cpp \
            src/preferences.cpp \
            src/mainwindow.cpp \
            src/common.cpp \
@@ -41,7 +40,6 @@ SOURCES += src/main.cpp \
 HEADERS += \
 #           src/openglwindow.h \
            src/ffengine.h \
-           src/systemdelegates.h \
            src/preferences.h \
            src/mainwindow.h \
            src/common.h \

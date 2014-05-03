@@ -11,9 +11,6 @@
 #include <QObject>
 #include <QString>
 #include <QMap>
-extern "C" {
-#include <libavengine/avengine.h>
-}
 #include "guidelegate.h"
 
 class QSize;
