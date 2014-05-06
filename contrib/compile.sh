@@ -7,7 +7,8 @@ die() {
 
 FFMPEG_DEBUG="--disable-debug"
 
-if [ $1="debug" ]; then
+if [ $1 == "debug" ]; then
+   echo "configure with debug"
    FFMPEG_DEBUG="--enable-debug=3 --disable-optimizations --disable-stripping"
 fi
 

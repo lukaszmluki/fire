@@ -68,8 +68,8 @@ const QString& Preferences::getSelectedFile() const
 
 Preferences::RenderingEngine Preferences::getRenderingEngine() const
 {
-    return RENDERING_ENGINE_X11;
-    //return RENDERING_ENGINE_OPENGL;
+    //return RENDERING_ENGINE_X11;
+    return RENDERING_ENGINE_OPENGL;
 }
 
 void Preferences::createDefaultConfig()

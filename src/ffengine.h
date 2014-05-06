@@ -16,6 +16,10 @@
 class QSize;
 class QRect;
 
+struct AVFilterGraph;
+struct AVFilterContext;
+struct AVFormatContext;
+
 class FFEngine : public QObject
 {
     Q_OBJECT
@@ -56,36 +60,40 @@ signals:
     void resumed();
     void durationChanged(double duration);
     void positionChanged(double position);
+    // private signals
+    void requestPacket(int streamIndex);
+
+private slots:
+    void pushPacket(int streamIndex);
 
 private:
-    static int initializeFFmpeg();
+    static bool initializeFFmpeg();
 
     static int staticControlMessage(struct AVFormatContext *ctx, int type,
                                     void *data, size_t size);
 
-    // Player callbacks
-    static void staticFinishedCallback(AVEngineContext *ctx);
-    static void staticPauseChangedCallback(AVEngineContext *ctx);
-    static void staticPositionChanged(AVEngineContext *ctx);
-    static void staticDurationChanged(AVEngineContext *ctx);
-    static void staticAudioOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *actx);
-    static void staticVideoOutputContextCreatedCallback(AVEngineContext *ctx, AVFormatContext *vctx);
-    void finishedCallback();
-    void pauseChangedCallback();
-    void positionChanged();
-    void durationChanged();
-    void audioOutputContextCreatedCallback(AVFormatContext *actx);
-    void videoOutputContextCreatedCallback(AVFormatContext *vctx);
+    bool createDevice();
+    bool probeDevice();
+    bool openDevice();
+    bool createStream();
+    bool createSink(struct AVFilterContext *filter, int idx);
+    bool createFilterGraph();
 
-    bool createContext();
-    void freeContext();
+private:
+    /* FFmpeg stuff */
+    struct AVFormatContext *m_deviceContext;
+    struct AVFilterGraph *m_filterGraph;
+    struct AVFilterContext *m_movieFilter;
+    struct AVFilterContext *m_buffersinkFilter;
+    struct AVFilterContext *m_abuffersinkFilter;
 
-    static AVEngineCallback m_staticCallbacks;
-    AVEngineContext *m_AVEngineContext;
-    QString m_videoDevice;
-    QString m_audioDevice;
-    DeviceOptions m_videoOptions;
-    DeviceOptions m_audioOptions;
+    int m_audioStreamIndex;
+    int m_videoStreamIndex;
+    QString m_mediaUrl;
+    QString m_videoDeviceName;
+    QString m_audioDeviceName;
+    DeviceOptions m_videoDeviceOptions;
+    DeviceOptions m_audioDeviceOptions;
 };
 
 #endif	/* SRC_FFENGINE_H */

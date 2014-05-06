@@ -25,17 +25,7 @@ SOURCES += src/main.cpp \
            src/playermanager.cpp \
            src/subtitleseditor.cpp \
            src/x11widget.cpp \
-           contrib/libavengine/audio.c \
-           contrib/libavengine/avengine.c \
-           contrib/libavengine/avengine_context.c \
-           contrib/libavengine/clock.c \
-           contrib/libavengine/filter.c \
-           contrib/libavengine/packet_queue.c \
-           contrib/libavengine/system_delegate.c \
-           contrib/libavengine/utils.c \
-           contrib/libavengine/video.c \
-           contrib/libavengine/video_device.c \
-           contrib/libavengine/event_loop.c
+           src/ffmpeg/ffavdictionary.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -47,4 +37,5 @@ HEADERS += \
            src/openglwidget.h \
            src/playermanager.h \
            src/subtitleseditor.h \
-           src/x11widget.h
+           src/x11widget.h \
+           src/ffmpeg/ffavdictionary.h

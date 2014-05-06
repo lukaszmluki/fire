@@ -53,9 +53,6 @@ FFEngine* PlayerManager::registerPlayer(VideoWidget *window)
         return NULL;
     }
 
-    qDebug() << videoOptions;
-    qDebug() << audioOptions;
-
     FFEngine *engine = new FFEngine(videoDevice, audioDevice, videoOptions, audioOptions, qo);
 
     m_players.insert(window, engine);
