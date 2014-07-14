@@ -47,6 +47,10 @@ public slots:
     void closeVideo();
     void showEditor();
     void hideEditor();
+    void toggleEditor();
+    void showPlaylist();
+    void hidePlaylist();
+    void togglePlaylist();
 
 private slots:
     /* gui delegate */
@@ -66,28 +70,47 @@ protected:
     void moveEvent(QMoveEvent *e);
 
 private:
+    //GUI construction
     QAction* addMenuAction(QMenu *menu, const QString &iconFile, const QString &text, const QObject *receiver, const char *member, const QKeySequence &shortcut, const QVariant &data, QActionGroup *group = NULL, bool showIcon = true);
     QToolButton* addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout);
 
-    QWidget *m_normalViewArea;
-    QWidget *m_subtitlesEditorBox;
-    QLabel *m_videoLinePosition;
-    QLabel *m_videoLineInfo;
+    void createCentralWidget();
+    void createMovieLine();
+    void createVideoArea();
+    void createVideoNavigator();
+    void createSubtitlesEditorArea();
+    void createPlaylistArea();
+    void createMenu();
+
+    //GUI elements
+    QWidget *m_centralWidget;
+
+    QWidget *m_movieLine;
+    QLabel  *m_moviePosition;
+    QLabel  *m_movieInfo;
+
+    QWidget *m_videoArea;
+    VideoWidget *m_videoWidget;
+    QWidget *m_navigationPanel;
+    QSlider *m_positionSlider;
+    QToolButton *m_playButton;
+    QSlider *m_volumeSlider;
+
+    QSplitter *m_splitterVideoSubtitlesArea;
+    QSplitter *m_splitterVideoPlaylistArea;
+
+    QWidget *m_subtitlesEditorArea;
+    SubtitlesEditor *m_subtitlesEditor;
     QLabel *m_editorFileName;
     QLabel *m_editorInfoLine;
-    QWidget *m_movieInfoLine;
-    QWidget *m_navigationPanel;
+
+    QWidget *m_playlistArea;
+
     QMenu *m_videoStreamsSubMenu;
     QMenu *m_audioStreamsSubMenu;
     QActionGroup *m_videoStreamsGroup;
     QActionGroup *m_audioStreamsGroup;
-    QToolBar *m_fileToolBar;
-    QSlider *m_positionSlider;
-    VideoWidget *m_videoArea;
-    SubtitlesEditor *m_subtitlesEditor;
-    QSplitter *m_splitterVideoEditor;
-    QToolButton *m_playButton;
-    QSlider *m_volumeSlider;
+    //QToolBar *m_fileToolBar;
 };
 
 #endif	/* SRC_MAINWINDOW_H */

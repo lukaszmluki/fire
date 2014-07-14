@@ -31,134 +31,154 @@
 #include "subtitleseditor.h"
 #include "playermanager.h"
 #include "ffengine.h"
+#include "playlist_view.h"
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+void MainWindow::createCentralWidget()
 {
-    QAction *action;
-    QActionGroup *group;
-    QMenu *menu;
-
-//create main window
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(0);
-    layout->setMargin(4);
-    m_normalViewArea = new QWidget();
-    m_normalViewArea->setLayout(layout);
+    layout->setMargin(0);
+    m_centralWidget = new QWidget();
+    m_centralWidget->setLayout(layout);
+}
 
-//create splitter and bottom text line
+void MainWindow::createMovieLine()
+{
     QHBoxLayout *hlayout = new QHBoxLayout();
-    m_movieInfoLine = new QWidget();
-    m_movieInfoLine->setLayout(hlayout);
+    m_movieLine = new QWidget();
+    m_movieLine->setLayout(hlayout);
     hlayout->setSpacing(5);
     hlayout->setContentsMargins(0, 1, 0, 0);
-    m_videoLinePosition = new QLabel();
-    hlayout->addWidget(m_videoLinePosition);
+    m_moviePosition = new QLabel();
+    hlayout->addWidget(m_moviePosition);
     hlayout->addStretch(1);
-    m_videoLineInfo = new QLabel();
-    hlayout->addWidget(m_videoLineInfo);
+    m_movieInfo = new QLabel();
+    hlayout->addWidget(m_movieInfo);
+}
 
-//create widget for the splitter (1)
-    m_splitterVideoEditor = new QSplitter(Qt::Vertical);
-    layout = new QVBoxLayout();
+void MainWindow::createVideoNavigator()
+{
+    QHBoxLayout *layout = new QHBoxLayout();
+    layout->setSpacing(5);
+    layout->setMargin(2);
+    m_navigationPanel = new QWidget();
+    m_navigationPanel->setLayout(layout);
+    m_navigationPanel->setMaximumHeight(30);
+
+    m_playButton = addNavigationButton("navigation/play.bmp", SLOT(togglePause()), layout);
+    addNavigationButton("navigation/stop.bmp", SLOT(stop()), layout);
+    addNavigationButton("navigation/backward.bmp", SLOT(backward()), layout);
+    addNavigationButton("navigation/forward.bmp", SLOT(forward()), layout);
+    addNavigationButton("navigation/previous.bmp", SLOT(previous()), layout);
+    addNavigationButton("navigation/next.bmp", SLOT(next()), layout);
+    layout->addSpacing(20);
+
+    QToolButton *mute = new QToolButton();
+    mute->setText("M");
+    mute->setMaximumWidth(20);
+    connect(mute, SIGNAL(clicked()), this, SLOT(muteButtonClicked()));
+    layout->addWidget(mute);
+    layout->addSpacing(10);
+
+    m_volumeSlider = new QSlider(Qt::Horizontal);
+    m_volumeSlider->setFocusPolicy(Qt::NoFocus);
+    m_volumeSlider->setRange(0, 100);
+    m_volumeSlider->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
+    m_volumeSlider->setMaximumWidth(100);
+    connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
+    layout->addWidget(m_volumeSlider);
+    layout->addSpacing(20);
+
+    m_positionSlider = new QSlider(Qt::Horizontal);
+    m_positionSlider->setTracking(false);
+    m_positionSlider->setFocusPolicy(Qt::NoFocus);
+    m_positionSlider->setRange(0, 0);
+    m_positionSlider->setSliderPosition(0);
+    connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
+    layout->addWidget(m_positionSlider);
+}
+
+void MainWindow::createPlaylistArea()
+{
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setSpacing(0);
+    layout->setMargin(0);
+
+    m_playlistArea = new QWidget();
+    m_playlistArea->setLayout(layout);
+
+    layout->addWidget(new PlaylistView());
+}
+
+void MainWindow::createVideoArea()
+{
+    QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(2);
     layout->setMargin(0);
-    QWidget *vbox = new QWidget();
-    vbox->setLayout(layout);
+
+    m_videoArea = new QWidget();
+    m_videoArea->setLayout(layout);
+    m_videoArea->setMinimumSize(100,100);
 
     Preferences::RenderingEngine renderingEngine = Preferences::instance().getRenderingEngine();
 
     if (renderingEngine == Preferences::RENDERING_ENGINE_OPENGL) {
-        m_videoArea = new OpenGLWidget();
+        m_videoWidget = new OpenGLWidget();
     } else if (renderingEngine == Preferences::RENDERING_ENGINE_X11) {
-        m_videoArea = new X11Widget();
+        m_videoWidget = new X11Widget();
     }
 
-    if (m_videoArea)
-        qDebug() << "using engine: " << m_videoArea->engineName();
+    if (m_videoWidget)
+        qDebug() << "using engine: " << m_videoWidget->engineName();
     else
         qCritical() << "No rendering engine available";
 
-    QWidget *videoWidget = dynamic_cast<QWidget *>(m_videoArea);
+    QWidget *videoWidget = dynamic_cast<QWidget *>(m_videoWidget);
     if (videoWidget) {
-        videoWidget->setMinimumSize(100,100);
         layout->addWidget(videoWidget);
     } else {
         qDebug() << "Cannot cast m_videoArea to QWidget";
     }
+}
 
-    hlayout = new QHBoxLayout();
-    hlayout->setSpacing(5);
-    hlayout->setMargin(2);
-    m_navigationPanel = new QWidget();
-    m_navigationPanel->setLayout(hlayout);
-    m_navigationPanel->setMaximumHeight(30);
-
-        m_playButton = addNavigationButton("navigation/play.bmp", SLOT(togglePause()), hlayout);
-        addNavigationButton("navigation/stop.bmp", SLOT(stop()), hlayout);
-        addNavigationButton("navigation/backward.bmp", SLOT(backward()), hlayout);
-        addNavigationButton("navigation/forward.bmp", SLOT(forward()), hlayout);
-        addNavigationButton("navigation/previous.bmp", SLOT(previous()), hlayout);
-        addNavigationButton("navigation/next.bmp", SLOT(next()), hlayout);
-        hlayout->addSpacing(20);
-        m_volumeSlider = new QSlider(Qt::Horizontal);
-        m_volumeSlider->setFocusPolicy(Qt::NoFocus);
-        m_volumeSlider->setRange(0, 100);
-        m_volumeSlider->setSliderPosition(Preferences::instance().getValue("Player/volume", 100).toInt());
-        m_volumeSlider->setMaximumWidth(100);
-        connect(m_volumeSlider, SIGNAL(valueChanged(int)), this, SLOT(volumeSliderChanged(int)));
-        QToolButton *mute = new QToolButton();
-        mute->setText("M");
-        mute->setMaximumWidth(20);
-        connect(mute, SIGNAL(clicked()), this, SLOT(muteButtonClicked()));
-        hlayout->addWidget(mute);
-        hlayout->addSpacing(10);
-        hlayout->addWidget(m_volumeSlider);
-        hlayout->addSpacing(20);
-        m_positionSlider = new QSlider(Qt::Horizontal);
-        m_positionSlider->setTracking(false);
-        m_positionSlider->setFocusPolicy(Qt::NoFocus);
-        m_positionSlider->setRange(0, 0);
-        m_positionSlider->setSliderPosition(0);
-        connect(m_positionSlider, SIGNAL(valueChanged(int)), this, SLOT(positionSliderChanged(int)));
-        hlayout->addWidget(m_positionSlider);
-
-    layout->addWidget(m_navigationPanel);
-    m_splitterVideoEditor->addWidget(vbox);
-    m_splitterVideoEditor->setCollapsible(0, false);
-
-//create widget for the splitter (2)
-    layout = new QVBoxLayout();
+void MainWindow::createSubtitlesEditorArea()
+{
+    QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing(2);
-    layout->setMargin(2);
-    m_subtitlesEditorBox = new QWidget();
-    m_subtitlesEditorBox->setLayout(layout);
-    m_editorFileName = new QLabel("", m_subtitlesEditorBox);
+    layout->setMargin(0);
+
+    m_subtitlesEditorArea = new QWidget();
+    m_subtitlesEditorArea->setLayout(layout);
+    m_subtitlesEditorArea->setMinimumSize(100,100);
+
+    m_editorFileName = new QLabel("");
     layout->addWidget(m_editorFileName);
-    m_subtitlesEditor = new SubtitlesEditor(m_subtitlesEditorBox);
+    m_subtitlesEditor = new SubtitlesEditor();
     m_subtitlesEditor->setLineWrapMode(QTextEdit::NoWrap);
 //    highlighter = new QSubtitlesHighlighter(subtitlesEditor);
     layout->addWidget(m_subtitlesEditor);
-    m_editorInfoLine = new QLabel("", m_subtitlesEditorBox);
+    m_editorInfoLine = new QLabel("");
     layout->addWidget(m_editorInfoLine);
-    m_splitterVideoEditor->addWidget(m_subtitlesEditorBox);
+}
 
-    m_normalViewArea->layout()->addWidget(m_splitterVideoEditor);
-    m_normalViewArea->layout()->addWidget(m_movieInfoLine);
-    setCentralWidget(m_normalViewArea);
+void MainWindow::createMenu()
+{
+//    QAction *action;
+    QActionGroup *group;
+    QMenu *menu;
 
-//TOOL BARS
-    m_fileToolBar = addToolBar(tr("File"));
+    //TOOL BARS
+//    m_fileToolBar = addToolBar(tr("File"));
 //    m_stuffToolBar = addToolBar(tr("Stuff"));
 
-//MENU
+    //MENU
     menu = menuBar()->addMenu(tr("&File"));
-    action = addMenuAction(menu, Utils::imagePath("menu/open_video.bmp"), tr("&Open video file"),
+    /*action =*/ addMenuAction(menu, Utils::imagePath("menu/open_video.bmp"), tr("&Open video file"),
                            this, SLOT(loadVideo()), QKeySequence(Qt::CTRL + Qt::Key_O), QVariant(0));
-    m_fileToolBar->addAction(action);
-    action = addMenuAction(menu, Utils::imagePath("menu/close_video.bmp"), tr("&Close video file"),
+//    m_fileToolBar->addAction(action);
+    /*action =*/ addMenuAction(menu, Utils::imagePath("menu/close_video.bmp"), tr("&Close video file"),
                            this, SLOT(closeVideo()), QKeySequence(Qt::Key_F4 + Qt::CTRL), QVariant(0));
-    m_fileToolBar->addAction(action);
+//    m_fileToolBar->addAction(action);
 //    menu->addSeparator();
 //    action = addMenuAction(menu, imagePath("menu/open_sub.bmp"), tr("Open &subtitles"), this, SLOT(loadSubtitles()), QKeySequence(Qt::CTRL + Qt::SHIFT + Qt::Key_O), QVariant(0));
 //    m_fileToolBar->addAction(action);
@@ -168,7 +188,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    action = addMenuAction(menu, imagePath("menu/close_sub.bmp"), tr("Close subtitles"), this, SLOT(closeSubtitles()), QKeySequence(Qt::Key_F4 + Qt::SHIFT + Qt::CTRL), QVariant(0));
 //    m_fileToolBar->addAction(action);
     menu->addSeparator();
-    action = addMenuAction(menu, Utils::imagePath("menu/exit.bmp"), tr("&Exit"), this, SLOT(quit()), QKeySequence(Qt::Key_F4 + Qt::ALT), QVariant(0));
+    /*action =*/ addMenuAction(menu, Utils::imagePath("menu/exit.bmp"), tr("&Exit"), this, SLOT(quit()), QKeySequence(Qt::Key_F4 + Qt::ALT), QVariant(0));
 
     menu = menuBar()->addMenu(tr("&Video"));
     m_videoStreamsSubMenu = menu->addMenu(tr("Streams"));
@@ -185,45 +205,74 @@ MainWindow::MainWindow(QWidget *parent) :
     m_audioStreamsSubMenu->setEnabled(false);
     m_audioStreamsGroup = new QActionGroup(m_audioStreamsSubMenu);
 
-//    m_subtitlesConvertersMenu = menuBar()->addMenu(tr("Subtitles converters"));
-//
-//    menu = menuBar()->addMenu(tr("&Editor"));
-//    action = addMenuAction(menu, imagePath("menu/editor.bmp"), tr("Show/hide subtitles &editor"), this, SLOT(toggleEditorVisibility()), QKeySequence(Qt::CTRL + Qt::Key_E), QVariant(0));
-//    m_stuffToolBar->addAction(action);
-//    menu->addSeparator();
-//    QMenu *encodingSubMenu = menu->addMenu(tr("En&coding"));
-//	group = new QActionGroup(encodingSubMenu);
-////	for(int i=0; Encodings[i].comment != NULL; i++) {
-////	    action = add_menu_action(encodingSubMenu, NULL, tr(Encodings[i].comment), this, SLOT(changeEncoding()), 0, QVariant(Encodings[i].name), group);
-////	    action->setChecked(Encodings[i].name == pref.getValue("editor/encoding", "default").toByteArray());
-////	}
-//    m_endLineSubMenu = menu->addMenu(tr("End line &mark"));
-//	group = new QActionGroup(m_endLineSubMenu);
-//	action = addMenuAction(m_endLineSubMenu, NULL, "Unix", this, SLOT(changeEndLine()), 0, QVariant(0), group);
-//	action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 0);
-//	action = addMenuAction(m_endLineSubMenu, NULL, "Windows", this, SLOT(changeEndLine()), 0, QVariant(1), group);
-//	action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 1);
-//	action = addMenuAction(m_endLineSubMenu, NULL, "Mac", this, SLOT(changeEndLine()), 0, QVariant(2), group);
-//	action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 2);
-//    menu->addSeparator();
-//
-////	incorrectTimeHighlighter = add_menu_action(subMenu, NULL, tr("Mark as red lines with incorrect time format"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
-////	incorrectTimeHighlighter->setCheckable(true);
-////	incorrectTimeHighlighter->setChecked(pref.getValue("editor/highlight_time_format", true).toBool());
-////	sublinesHighlighter = add_menu_action(subMenu, NULL, tr("Mark as ping lines with to many sublines"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
-////	sublinesHighlighter->setCheckable(true);
-////	sublinesHighlighter->setChecked(pref.getValue("editor/highlight_sublines", true).toBool());
-////	charsHighlighter = add_menu_action(subMenu, NULL, tr("Mark as ping sublines with to many characters"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
-////	charsHighlighter->setCheckable(true);
-////	charsHighlighter->setChecked(pref.getValue("editor/highlight_chars", true).toBool());
-////	grayHighlighter = add_menu_action(subMenu, NULL, tr("Mark as gray short-displayed lines"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
-////	grayHighlighter->setCheckable(true);
-////	grayHighlighter->setChecked(pref.getValue("editor/highlight_gray", true).toBool());
-//    addMenuAction(menu, imagePath("menu/shortcuts.bmp"), tr("Load &shortcuts"), m_subtitlesEditor, SLOT(loadShortCuts()), 0, QVariant(1));
-////
-//    menu = menuBar()->addMenu(tr("&Options"));
-//	action = addMenuAction(menu, imagePath("menu/pref.bmp"), tr("&Preferences"), optionsWindow, SLOT(exec()), QKeySequence(Qt::Key_U + Qt::CTRL), QVariant(0));
-//	m_stuffToolBar->addAction(action);
+//        m_subtitlesConvertersMenu = menuBar()->addMenu(tr("Subtitles converters"));
+
+        menu = menuBar()->addMenu(tr("&Editor"));
+        /*action =*/ addMenuAction(menu, Utils::imagePath("menu/editor.bmp"), tr("Show/hide subtitles &editor"), this, SLOT(toggleEditor()), QKeySequence(Qt::CTRL + Qt::Key_E), QVariant(0));
+//        m_stuffToolBar->addAction(action);
+//        menu->addSeparator();
+//        QMenu *encodingSubMenu = menu->addMenu(tr("En&coding"));
+//        group = new QActionGroup(encodingSubMenu);
+//        for(int i=0; Encodings[i].comment != NULL; i++) {
+//            action = add_menu_action(encodingSubMenu, NULL, tr(Encodings[i].comment), this, SLOT(changeEncoding()), 0, QVariant(Encodings[i].name), group);
+//            action->setChecked(Encodings[i].name == pref.getValue("editor/encoding", "default").toByteArray());
+//        }
+//        m_endLineSubMenu = menu->addMenu(tr("End line &mark"));
+//        group = new QActionGroup(m_endLineSubMenu);
+//        action = addMenuAction(m_endLineSubMenu, NULL, "Unix", this, SLOT(changeEndLine()), 0, QVariant(0), group);
+//        action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 0);
+//        action = addMenuAction(m_endLineSubMenu, NULL, "Windows", this, SLOT(changeEndLine()), 0, QVariant(1), group);
+//        action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 1);
+//        action = addMenuAction(m_endLineSubMenu, NULL, "Mac", this, SLOT(changeEndLine()), 0, QVariant(2), group);
+//        action->setChecked(Preferences::instance().getValue("editor/end_line_mark", 0) == 2);
+//        menu->addSeparator();
+
+//        //incorrectTimeHighlighter = add_menu_action(subMenu, NULL, tr("Mark as red lines with incorrect time format"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
+//        //incorrectTimeHighlighter->setCheckable(true);
+//        //incorrectTimeHighlighter->setChecked(pref.getValue("editor/highlight_time_format", true).toBool());
+//        //sublinesHighlighter = add_menu_action(subMenu, NULL, tr("Mark as ping lines with to many sublines"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
+//        //sublinesHighlighter->setCheckable(true);
+//        //sublinesHighlighter->setChecked(pref.getValue("editor/highlight_sublines", true).toBool());
+//        //charsHighlighter = add_menu_action(subMenu, NULL, tr("Mark as ping sublines with to many characters"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
+//        //charsHighlighter->setCheckable(true);
+//        //charsHighlighter->setChecked(pref.getValue("editor/highlight_chars", true).toBool());
+//        //grayHighlighter = add_menu_action(subMenu, NULL, tr("Mark as gray short-displayed lines"), this, SLOT(saveMenuOptions()), 0, QVariant(0));
+//        //grayHighlighter->setCheckable(true);
+//        //grayHighlighter->setChecked(pref.getValue("editor/highlight_gray", true).toBool());
+//        addMenuAction(menu, imagePath("menu/shortcuts.bmp"), tr("Load &shortcuts"), m_subtitlesEditor, SLOT(loadShortCuts()), 0, QVariant(1));
+
+//        menu = menuBar()->addMenu(tr("&Options"));
+//        action = addMenuAction(menu, imagePath("menu/pref.bmp"), tr("&Preferences"), optionsWindow, SLOT(exec()), QKeySequence(Qt::Key_U + Qt::CTRL), QVariant(0));
+//        m_stuffToolBar->addAction(action);
+
+    menu = menuBar()->addMenu(tr("&View"));
+    addMenuAction(menu, NULL, tr("&Playlist"),
+                  this, SLOT(togglePlaylist()), QKeySequence(Qt::CTRL + Qt::Key_L), QVariant(0));}
+
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent)
+{
+    createCentralWidget();
+    createMovieLine();
+    createVideoArea();
+    createSubtitlesEditorArea();
+    createPlaylistArea();
+    createMenu();
+    createVideoNavigator();
+
+    m_splitterVideoPlaylistArea = new QSplitter(Qt::Horizontal);
+    m_splitterVideoPlaylistArea->addWidget(m_playlistArea);
+    m_splitterVideoPlaylistArea->addWidget(m_videoArea);
+
+    m_splitterVideoSubtitlesArea = new QSplitter(Qt::Vertical);
+    m_splitterVideoSubtitlesArea->addWidget(m_splitterVideoPlaylistArea);
+    m_splitterVideoSubtitlesArea->addWidget(m_navigationPanel);
+    m_splitterVideoSubtitlesArea->addWidget(m_subtitlesEditorArea);
+    m_splitterVideoSubtitlesArea->setCollapsible(0, false);
+
+    m_centralWidget->layout()->addWidget(m_splitterVideoSubtitlesArea);
+    //m_centralWidget->layout()->addWidget(m_movieLine);
+    setCentralWidget(m_centralWidget);
 
 //display main window
     QDesktopWidget *desktop = QApplication::desktop();
@@ -241,7 +290,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(Utils::APPLICATION_NAME);
 
 //register player
-    FFEngine *player = PlayerManager::instance().registerPlayer(m_videoArea);
+    FFEngine *player = PlayerManager::instance().registerPlayer(m_videoWidget);
     player->addGuiDelegate(this);
 
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));
@@ -262,7 +311,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
-    PlayerManager::instance().unregisterPlayer(m_videoArea);
+    PlayerManager::instance().unregisterPlayer(m_videoWidget);
 }
 
 QToolButton* MainWindow::addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout)
@@ -316,14 +365,40 @@ void MainWindow::moveEvent(QMoveEvent *e)
 
 void MainWindow::showEditor()
 {
-    m_subtitlesEditorBox->show();
+    m_subtitlesEditorArea->show();
     m_subtitlesEditor->setFocus();
 }
 
 void MainWindow::hideEditor()
 {
     m_subtitlesEditor->clearFocus();
-    m_subtitlesEditorBox->hide();
+    m_subtitlesEditorArea->hide();
+}
+
+void MainWindow::toggleEditor()
+{
+    if (m_subtitlesEditorArea->isHidden())
+        showEditor();
+    else
+        hideEditor();
+}
+
+void MainWindow::showPlaylist()
+{
+    m_playlistArea->show();
+}
+
+void MainWindow::hidePlaylist()
+{
+    m_playlistArea->hide();
+}
+
+void MainWindow::togglePlaylist()
+{
+    if (m_playlistArea->isHidden())
+        showPlaylist();
+    else
+        hidePlaylist();
 }
 
 void MainWindow::loadVideo()
@@ -335,7 +410,7 @@ void MainWindow::loadVideo()
     }
     Preferences::instance().setLastDir(filename);
 
-    PlayerManager::instance().getPlayer(m_videoArea)->openMedia(filename);
+    PlayerManager::instance().getPlayer(m_videoWidget)->openMedia(filename);
 
 //    filename = filename.left(filename.lastIndexOf(".")) + "txt";
 //    if (QFile::exists(filename)) {
@@ -356,7 +431,7 @@ void MainWindow::stop()
 
 void MainWindow::togglePause()
 {
-    PlayerManager::instance().getPlayer(m_videoArea)->togglePause();
+    PlayerManager::instance().getPlayer(m_videoWidget)->togglePause();
 }
 
 void MainWindow::paused()
@@ -382,18 +457,18 @@ void MainWindow::positionChanged(double position)
 
 void MainWindow::positionSliderChanged(int position)
 {
-    PlayerManager::instance().getPlayer(m_videoArea)->seek(position);
+    PlayerManager::instance().getPlayer(m_videoWidget)->seek(position);
 }
 
 void MainWindow::volumeSliderChanged(int volume)
 {
     if (m_volumeSlider->isSliderDown())
-        PlayerManager::instance().getPlayer(m_videoArea)->setVolume(static_cast<double>(volume) / 100.0);
+        PlayerManager::instance().getPlayer(m_videoWidget)->setVolume(static_cast<double>(volume) / 100.0);
 }
 
 void MainWindow::muteButtonClicked()
 {
-    PlayerManager::instance().getPlayer(m_videoArea)->toggleMute();
+    PlayerManager::instance().getPlayer(m_videoWidget)->toggleMute();
 }
 
 void MainWindow::muteChanged(int mute)

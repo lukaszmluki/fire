@@ -3,7 +3,7 @@ TARGET = fire
 VERSION = 0.0.1
 
 CONFIG += debug
-QT += opengl
+QT += opengl core gui
 
 QMAKE_CXXFLAGS += -Werror -Wextra
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
@@ -25,7 +25,8 @@ SOURCES += src/main.cpp \
            src/playermanager.cpp \
            src/subtitleseditor.cpp \
            src/x11widget.cpp \
-           src/ffmpeg/ffavdictionary.cpp
+           src/ffmpeg/ffavdictionary.cpp \
+           src/playlist_view.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -38,4 +39,5 @@ HEADERS += \
            src/playermanager.h \
            src/subtitleseditor.h \
            src/x11widget.h \
-           src/ffmpeg/ffavdictionary.h
+           src/ffmpeg/ffavdictionary.h \
+           src/playlist_view.h
