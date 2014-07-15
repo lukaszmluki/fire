@@ -35,11 +35,10 @@ bool FFAVDictionary::insert(const DictionaryMap &map)
 
 QDebug operator<<(QDebug out, const FFAVDictionary &d)
 {
-    const AVDictionary *dd = d.get();
     AVDictionaryEntry *t = NULL;
 
     out.nospace();
-    while ((t = av_dict_get(dd, "", t, AV_DICT_IGNORE_SUFFIX)))
+    while ((t = av_dict_get(d.get(), "", t, AV_DICT_IGNORE_SUFFIX)))
         out << "\"" << t->key << "\" = \"" << t->value << "\", ";
 
     return out.maybeSpace();

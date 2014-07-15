@@ -32,7 +32,7 @@ public:
         return &m_dict;
     }
 
-    const AVDictionary* get() const
+    AVDictionary* get() const
     {
         return m_dict;
     }
