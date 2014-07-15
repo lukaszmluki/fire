@@ -299,6 +299,7 @@ bool FFEngine::openMedia(const QString &media)
         if (!openDevice()) {
             throw(1);
         }
+        emit resumed();
         return true;
     }
     catch (int i) {
