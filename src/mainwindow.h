@@ -48,9 +48,11 @@ public slots:
     void showEditor();
     void hideEditor();
     void toggleEditor();
+    void updateEditorVisibility();
     void showPlaylist();
     void hidePlaylist();
     void togglePlaylist();
+    void updatePlaylistVisibility();
 
 private slots:
     /* gui delegate */

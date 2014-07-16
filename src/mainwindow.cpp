@@ -301,17 +301,33 @@ MainWindow::MainWindow(QWidget *parent) :
 //    connect(this, SIGNAL(savingSubtitles()), m_subtitlesEditor, SLOT(saveSubtitles()));
 //    connect(this, SIGNAL(savingSubtitlesAs(const QString&)), m_subtitlesEditor, SLOT(saveSubtitlesAs(const QString&)));
 //    updatePlayerState();
+    updateEditorVisibility();
+    updatePlaylistVisibility();
     if (Preferences::instance().getValue("Window/maximized", false).toBool())
         showMaximized();
     else
         show();
-
-    hideEditor();
 }
 
 MainWindow::~MainWindow()
 {
     PlayerManager::instance().unregisterPlayer(m_videoWidget);
+}
+
+void MainWindow::updatePlaylistVisibility()
+{
+    if (Preferences::instance().getValue("Window/playlist", true).toBool())
+        showPlaylist();
+    else
+        hidePlaylist();
+}
+
+void MainWindow::updateEditorVisibility()
+{
+    if (Preferences::instance().getValue("Window/editor", false).toBool())
+        showEditor();
+    else
+        hideEditor();
 }
 
 QToolButton* MainWindow::addNavigationButton(const QString &iconFile, const char* member, QHBoxLayout *layout)
@@ -367,12 +383,14 @@ void MainWindow::showEditor()
 {
     m_subtitlesEditorArea->show();
     m_subtitlesEditor->setFocus();
+    Preferences::instance().setValue("Window/editor", true);
 }
 
 void MainWindow::hideEditor()
 {
     m_subtitlesEditor->clearFocus();
     m_subtitlesEditorArea->hide();
+    Preferences::instance().setValue("Window/editor", false);
 }
 
 void MainWindow::toggleEditor()
@@ -386,11 +404,13 @@ void MainWindow::toggleEditor()
 void MainWindow::showPlaylist()
 {
     m_playlistArea->show();
+    Preferences::instance().setValue("Window/playlist", true);
 }
 
 void MainWindow::hidePlaylist()
 {
     m_playlistArea->hide();
+    Preferences::instance().setValue("Window/playlist", false);
 }
 
 void MainWindow::togglePlaylist()
