@@ -6,9 +6,10 @@
  */
 
 #include "playlist_view.h"
+#include "playlist_data_model.h"
 
 PlaylistView::PlaylistView(QWidget *parent) :
     QTreeView(parent)
 {
-
+    setModel(new PlaylistDataModel());
 }

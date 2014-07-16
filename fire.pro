@@ -26,7 +26,9 @@ SOURCES += src/main.cpp \
            src/subtitleseditor.cpp \
            src/x11widget.cpp \
            src/ffmpeg/ffavdictionary.cpp \
-           src/playlist_view.cpp
+           src/playlist_view.cpp \
+           src/playlist_data_model.cpp \
+    src/playlist_item_file.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -40,4 +42,7 @@ HEADERS += \
            src/subtitleseditor.h \
            src/x11widget.h \
            src/ffmpeg/ffavdictionary.h \
-           src/playlist_view.h
+           src/playlist_view.h \
+           src/playlist_data_model.h \
+    src/playlist_item.h \
+    src/playlist_item_file.h
