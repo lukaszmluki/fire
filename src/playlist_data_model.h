@@ -30,6 +30,9 @@ public:
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
+    bool canFetchMore(const QModelIndex &parent) const;
+    void fetchMore (const QModelIndex &parent);
+
 private:
 //    void setupModelData(const QStringList &lines, TreeItem *parent);
     PlaylistItem *m_rootItem;

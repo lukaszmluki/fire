@@ -24,7 +24,7 @@ bool FFEngine::initializeFFmpeg()
     avdevice_register_all();
     avfilter_register_all();
     avformat_network_init();
-    av_log_set_level(AV_LOG_DEBUG);
+    //av_log_set_level(AV_LOG_DEBUG);
     return true;
 }
 

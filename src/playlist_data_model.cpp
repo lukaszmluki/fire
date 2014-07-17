@@ -11,7 +11,7 @@
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
-    m_rootItem = new PlaylistItemFile(PlaylistItemData("/", "/"), NULL);
+    m_rootItem = new PlaylistItemFile(PlaylistItemData("/", "ftp://dupa:dupadupa@localhost/", true), NULL);
 }
 
 PlaylistDataModel::~PlaylistDataModel()
@@ -48,6 +48,9 @@ Qt::ItemFlags PlaylistDataModel::flags(const QModelIndex &index) const
 
 QVariant PlaylistDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    Q_UNUSED(section);
+    Q_UNUSED(orientation);
+    Q_UNUSED(role);
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
        return m_rootItem->columnData(section);
     return QVariant();
@@ -101,8 +104,25 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
  }
 
- //void PlaylistDataModel::setupModelData(const QStringList &lines, TreeItem *parent)
- //{
+bool PlaylistDataModel::canFetchMore(const QModelIndex &parent) const
+{
+    return false;
+    if (!parent.isValid())
+        return false;
+    PlaylistItem *item = static_cast<PlaylistItem*>(parent.internalPointer());
+    return item->canFetchMore();
+}
+
+void PlaylistDataModel::fetchMore (const QModelIndex &parent)
+{
+    if (parent.isValid()) {
+        PlaylistItem *item = static_cast<PlaylistItem*>(parent.internalPointer());
+        item->fetchMore();
+    }
+}
+
+//void PlaylistDataModel::setupModelData(const QStringList &lines, TreeItem *parent)
+//{
 //     QList<TreeItem*> parents;
 //     QList<int> indentations;
 //     parents << parent;
@@ -148,4 +168,4 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
 
 //         number++;
 //     }
- //}
+//}

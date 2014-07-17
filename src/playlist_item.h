@@ -15,9 +15,10 @@
 class PlaylistItemData
 {
 public:
-    PlaylistItemData(const QString &name, const QString &url) :
+    PlaylistItemData(const QString &name, const QString &url, bool haveChildren) :
         m_name(name),
-        m_url(url)
+        m_url(url),
+        m_haveChildren(haveChildren)
     {
     }
 
@@ -25,6 +26,7 @@ public:
     {
         return 1;
     }
+
     QVariant columntData(int column) const
     {
         Q_ASSERT(column < columnCount());
@@ -33,6 +35,7 @@ public:
 
     QString m_name;
     QString m_url;
+    bool m_haveChildren;
 };
 
 class PlaylistItem
@@ -40,7 +43,8 @@ class PlaylistItem
 public:
     PlaylistItem(const PlaylistItemData &data, PlaylistItem *parent = 0) :
         m_itemData(data),
-        m_parentItem(parent)
+        m_parentItem(parent),
+        m_fetched(false)
     {
     }
 
@@ -71,12 +75,18 @@ public:
     }
 
     virtual PlaylistItem *child(int row) = 0;
-    virtual int childCount() const = 0;
+    virtual int childCount() = 0;
+    virtual void fetchMore() = 0;
+    virtual bool canFetchMore() = 0;
 
-private:
+public:
+    void asynchFetch();
+    virtual void fetch() {}
+
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
     PlaylistItem *m_parentItem;
+    bool m_fetched;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_H */
