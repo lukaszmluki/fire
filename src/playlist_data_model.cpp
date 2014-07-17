@@ -6,12 +6,12 @@
  */
 
 #include "playlist_data_model.h"
-#include "playlist_item_file.h"
+#include "playlist_item_top.h"
 
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
-    m_rootItem = new PlaylistItemFile(PlaylistItemData("/", "ftp://dupa:dupadupa@localhost/", true), NULL);
+    m_rootItem = new PlaylistItemTop();
 }
 
 PlaylistDataModel::~PlaylistDataModel()

@@ -29,6 +29,7 @@ SOURCES += src/main.cpp \
            src/playlist_view.cpp \
            src/playlist_data_model.cpp \
            src/playlist_item.cpp \
+           src/playlist_item_top.cpp \
            src/playlist_item_file.cpp
 
 HEADERS += \
@@ -46,4 +47,5 @@ HEADERS += \
            src/playlist_view.h \
            src/playlist_data_model.h \
            src/playlist_item.h \
+           src/playlist_item_top.h \
            src/playlist_item_file.h
