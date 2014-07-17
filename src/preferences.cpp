@@ -27,9 +27,9 @@ Preferences::Preferences()
     QString m_configFile = QDir::homePath();
     qDebug() << "Loading preferences...";
 #if defined(Q_OS_LINUX) || defined(Q_OS_MAC)
-    m_configFile.append( "/.opensubedit/config.ini");
+    m_configFile.append( "/.fireplayer/config.ini");
 #elif defined(Q_OS_WIN32)
-    m_configFile.append( "\\Open SubEdit\\config.ini");
+    m_configFile.append( "\\Fire Player\\config.ini");
 #endif
     qDebug() << m_configFile;
     bool needDefault = !QFile::exists(m_configFile);
