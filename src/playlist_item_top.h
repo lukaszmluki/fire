@@ -5,8 +5,8 @@
  * Created on July 17, 2014, 08:09 PM
  */
 
-#ifndef PLAYLIST_ITEM_TOP_H
-#define PLAYLIST_ITEM_TOP_H
+#ifndef SRC_PLAYLIST_ITEM_TOP_H
+#define SRC_PLAYLIST_ITEM_TOP_H
 
 #include "playlist_item.h"
 #include <QList>
@@ -25,4 +25,4 @@ private:
     void fetch();
 };
 
-#endif // PLAYLIST_ITEM_FILE_H
+#endif /* SRC_PLAYLIST_ITEM_TOP_H */

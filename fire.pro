@@ -30,7 +30,8 @@ SOURCES += src/main.cpp \
            src/playlist_data_model.cpp \
            src/playlist_item.cpp \
            src/playlist_item_top.cpp \
-           src/playlist_item_file.cpp
+           src/playlist_item_file.cpp \
+           src/worker.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -48,4 +49,5 @@ HEADERS += \
            src/playlist_data_model.h \
            src/playlist_item.h \
            src/playlist_item_top.h \
-           src/playlist_item_file.h
+           src/playlist_item_file.h \
+           src/worker.h

@@ -7,14 +7,6 @@
 
 #include "playlist_item.h"
 
-#include <QThread>
-
-//class FetchWorker : public QObject
-//{
-//    Q_OBJECT
-
-//};
-
 void PlaylistItem::asynchFetch()
 {
     fetch();

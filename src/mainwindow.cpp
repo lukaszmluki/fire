@@ -247,7 +247,8 @@ void MainWindow::createMenu()
 
     menu = menuBar()->addMenu(tr("&View"));
     addMenuAction(menu, NULL, tr("&Playlist"),
-                  this, SLOT(togglePlaylist()), QKeySequence(Qt::CTRL + Qt::Key_L), QVariant(0));}
+                  this, SLOT(togglePlaylist()), QKeySequence(Qt::CTRL + Qt::Key_L), QVariant(0));
+}
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
