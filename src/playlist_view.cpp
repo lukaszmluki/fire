@@ -11,5 +11,5 @@
 PlaylistView::PlaylistView(QWidget *parent) :
     QTreeView(parent)
 {
-    setModel(new PlaylistDataModel());
+    setModel(new PlaylistDataModel(this));
 }

@@ -37,15 +37,13 @@ void PlaylistItemFile::fetch()
         return;
     const AVIODirEntry *next = NULL;
     AVIOContext *avioCtx;
+    QString childUrl;
     qDebug() << "listing... " << m_itemData.m_url;
     if (avio_open_dir(&avioCtx, m_itemData.m_url.toUtf8().constData(), NULL, NULL) >= 0) {
-        while (avio_read_dir(avioCtx, &next) >= 0) {
-            if (!next)
-                break;
+        while ((avio_read_dir(avioCtx, &next) >= 0) && next) {
+            childUrl = m_itemData.m_url + (m_itemData.m_url.endsWith("/") ? "" : "/") + next->name;
             m_childItems.push_front(new PlaylistItemFile(
-                PlaylistItemData(QString::fromUtf8(next->name),
-                                 QDir::cleanPath(m_itemData.m_url + "/" + next->name),
-                                 next->type == AVIO_ENTRY_DIRECTORY),
+                PlaylistItemData(QString::fromUtf8(next->name), childUrl, next->type == AVIO_ENTRY_DIRECTORY),
                 static_cast<PlaylistItem *>(this)));
         }
         avio_close_dir(avioCtx);

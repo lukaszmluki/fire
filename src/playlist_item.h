@@ -50,6 +50,7 @@ public:
 
     virtual ~PlaylistItem()
     {
+        qDeleteAll(m_childItems);
     }
 
     int columnCount() const
