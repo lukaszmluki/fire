@@ -75,8 +75,6 @@ Preferences::RenderingEngine Preferences::getRenderingEngine() const
 void Preferences::createDefaultConfig()
 {
     setValue("last_dir", QDir::homePath());
-    setValue("Window/width", 640);
-    setValue("Window/height", 480);
 }
 
 void Preferences::setLastDir(const QString &dir)

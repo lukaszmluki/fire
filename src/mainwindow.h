@@ -66,6 +66,7 @@ private slots:
     void positionSliderChanged(int position);
     void volumeSliderChanged(int volume);
     void muteButtonClicked();
+    void saveSplitterState(int pos, int index);
 
 protected:
     void resizeEvent(QResizeEvent *e);

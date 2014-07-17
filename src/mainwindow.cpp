@@ -265,31 +265,40 @@ MainWindow::MainWindow(QWidget *parent) :
     m_splitterVideoPlaylistArea->addWidget(m_videoArea);
 
     m_splitterVideoSubtitlesArea = new QSplitter(Qt::Vertical);
-    m_splitterVideoSubtitlesArea->addWidget(m_splitterVideoPlaylistArea);
-    m_splitterVideoSubtitlesArea->addWidget(m_navigationPanel);
+    m_splitterVideoSubtitlesArea->addWidget(new QWidget());
+    m_splitterVideoSubtitlesArea->widget(0)->setLayout(new QVBoxLayout());
+    m_splitterVideoSubtitlesArea->widget(0)->layout()->setMargin(0);
+    m_splitterVideoSubtitlesArea->widget(0)->layout()->setSpacing(0);
+    m_splitterVideoSubtitlesArea->widget(0)->layout()->addWidget(m_splitterVideoPlaylistArea);
+    m_splitterVideoSubtitlesArea->widget(0)->layout()->addWidget(m_navigationPanel);
     m_splitterVideoSubtitlesArea->addWidget(m_subtitlesEditorArea);
     m_splitterVideoSubtitlesArea->setCollapsible(0, false);
+    m_splitterVideoSubtitlesArea->setCollapsible(1, true);
 
     m_centralWidget->layout()->addWidget(m_splitterVideoSubtitlesArea);
     //m_centralWidget->layout()->addWidget(m_movieLine);
     setCentralWidget(m_centralWidget);
 
-//display main window
-    QDesktopWidget *desktop = QApplication::desktop();
-    int x = Preferences::instance().getValue("Window/x", desktop->availableGeometry().x()).toInt();
-    int y = Preferences::instance().getValue("Window/y", desktop->availableGeometry().y()).toInt();
-    int w = Preferences::instance().getValue("Window/width", desktop->availableGeometry().width()).toInt();
-    int h = Preferences::instance().getValue("Window/height", desktop->availableGeometry().height()).toInt();
-    if (x > desktop->availableGeometry().width() + desktop->availableGeometry().x())
-        x = desktop->availableGeometry().x();
-    if (y > desktop->availableGeometry().height() + desktop->availableGeometry().y())
-        y = desktop->availableGeometry().y();
-    //if (x + w > desktop->width()) { w = desktop->availableGeometry().width(); x = desktop->availableGeometry().x(); }
-    //if (y + h > desktop->height()) { h = desktop->availableGeometry().height(); desktop->availableGeometry().y(); }
-    setGeometry(x, y, w, h);
+    //restore geometry of the window
+    const QByteArray &geometry = Preferences::instance().getValue("Window/geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty()) {
+        setGeometry(0, 0, 640, 480);
+        m_splitterVideoPlaylistArea->setSizes(QList<int>() << 140 << 500);
+    } else {
+        restoreGeometry(geometry);
+        m_splitterVideoPlaylistArea->restoreState(
+            Preferences::instance().getValue("Window/splitter_video_playlist_state", QByteArray()).toByteArray());
+        m_splitterVideoSubtitlesArea->restoreState(
+            Preferences::instance().getValue("Window/splitter_video_subtitles_state", QByteArray()).toByteArray());
+    }
+    updateEditorVisibility();
+    updatePlaylistVisibility();
+    connect(m_splitterVideoPlaylistArea, SIGNAL(splitterMoved(int, int)), this, SLOT(saveSplitterState(int, int)));
+    connect(m_splitterVideoSubtitlesArea, SIGNAL(splitterMoved(int, int)), this, SLOT(saveSplitterState(int, int)));
+
     setWindowTitle(Utils::APPLICATION_NAME);
 
-//register player
+    //register player
     FFEngine *player = PlayerManager::instance().registerPlayer(m_videoWidget);
     player->addGuiDelegate(this);
 
@@ -301,12 +310,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    connect(this, SIGNAL(savingSubtitles()), m_subtitlesEditor, SLOT(saveSubtitles()));
 //    connect(this, SIGNAL(savingSubtitlesAs(const QString&)), m_subtitlesEditor, SLOT(saveSubtitlesAs(const QString&)));
 //    updatePlayerState();
-    updateEditorVisibility();
-    updatePlaylistVisibility();
-    if (Preferences::instance().getValue("Window/maximized", false).toBool())
-        showMaximized();
-    else
-        show();
+    show();
 }
 
 MainWindow::~MainWindow()
@@ -362,21 +366,16 @@ QAction* MainWindow::addMenuAction(QMenu *menu, const QString &iconFile, const Q
 
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
-    if (/*!m_videoArea->isFullScreen() &&*/ !isMaximized()) {
-        Preferences::instance().setValue("Window/height", e->size().height(), false);
-        Preferences::instance().setValue("Window/width", e->size().width(), false);
-    }
-    Preferences::instance().setValue("Window/maximized", isMaximized(), false);
     QMainWindow::resizeEvent(e);
+    Preferences::instance().setValue("Window/geometry", saveGeometry());
+    saveSplitterState(0, 0);
 }
 
 void MainWindow::moveEvent(QMoveEvent *e)
 {
-    if (/*!m_videoArea->isFullScreen() &&*/ !isMaximized()) {
-        Preferences::instance().setValue("Window/x", e->pos().x(), false);
-        Preferences::instance().setValue("Window/y", e->pos().y(), false);
-    }
     QMainWindow::moveEvent(e);
+    Preferences::instance().setValue("Window/geometry", saveGeometry());
+    saveSplitterState(0, 0);
 }
 
 void MainWindow::showEditor()
@@ -500,4 +499,13 @@ void MainWindow::volumeChanged(double volume)
 {
     if (!m_volumeSlider->isSliderDown())
         m_volumeSlider->setSliderPosition(volume * 100);
+}
+
+void MainWindow::saveSplitterState(int pos, int index)
+{
+    Q_UNUSED(pos) Q_UNUSED(index)
+    Preferences::instance().setValue("Window/splitter_video_playlist_state",
+                                     m_splitterVideoPlaylistArea->saveState());
+    Preferences::instance().setValue("Window/splitter_video_subtitles_state",
+                                     m_splitterVideoSubtitlesArea->saveState());
 }
