@@ -24,9 +24,9 @@ PlaylistItemFile::~PlaylistItemFile()
 
 bool PlaylistItemFile::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 {
-    if (i1->m_itemData.m_haveChildren != i2->m_itemData.m_haveChildren)
-        return i1->m_itemData.m_haveChildren;
-    return i1->m_itemData.m_name < i2->m_itemData.m_name;
+    if (i1->itemData().m_haveChildren != i2->itemData().m_haveChildren)
+        return i1->itemData().m_haveChildren;
+    return i1->itemData().m_name < i2->itemData().m_name;
 }
 
 void PlaylistItemFile::fetch()

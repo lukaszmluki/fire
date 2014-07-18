@@ -75,12 +75,17 @@ public:
         return 0;
     }
 
+    const PlaylistItemData& itemData() const
+    {
+        return m_itemData;
+    }
+
     virtual PlaylistItem *child(int row) = 0;
     virtual int childCount() = 0;
     virtual void fetchMore() = 0;
     virtual bool canFetchMore() = 0;
 
-public:
+protected:
     void asynchFetch();
     virtual void fetch() {}
 
