@@ -6,6 +6,9 @@
  */
 
 #include "playlist_data_model.h"
+#include <QDebug>
+#include <QIcon>
+#include "common.h"
 #include "playlist_item_top.h"
 
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
@@ -32,11 +35,14 @@ QVariant PlaylistDataModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole)
-        return QVariant();
-
     PlaylistItem *item = static_cast<PlaylistItem *>(index.internalPointer());
-    return item->columnData(index.column());
+
+    if (role == Qt::DisplayRole) {
+        return item->columnData(index.column());
+    } else if (role == Qt::DecorationRole && item->haveChildren()) {
+        return QIcon(Utils::imagePath("playlist/dir.png"));
+    }
+    return QVariant();
 }
 
 Qt::ItemFlags PlaylistDataModel::flags(const QModelIndex &index) const

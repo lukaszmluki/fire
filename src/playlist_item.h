@@ -90,9 +90,14 @@ public:
         m_modelIndex = modelIndex;
     }
 
-    QModelIndex modelIndex()
+    QModelIndex modelIndex() const
     {
         return m_modelIndex;
+    }
+
+    bool haveChildren() const
+    {
+        return m_itemData.m_haveChildren;
     }
 
     virtual PlaylistItem *child(int row) = 0;

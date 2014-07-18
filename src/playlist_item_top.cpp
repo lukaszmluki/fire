@@ -9,11 +9,13 @@
 #include "playlist_item_file.h"
 
 #include <QDebug>
+#include <QDir>
 
 PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
     PlaylistItem(PlaylistItemData("Sources", "", true), NULL, model)
 {
-    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("ftp dupa", "ftp://dupa:dupadupa@localhost/", true), this, model));
+    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("Home", QDir::homePath(), true), this, model));
+    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("System", "/", true), this, model));
 }
 
 PlaylistItemTop::~PlaylistItemTop()
