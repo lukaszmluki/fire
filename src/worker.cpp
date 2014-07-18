@@ -22,7 +22,7 @@ bool WorkerObject::event(QEvent *e)
             deleteLater();
         return true;
     }
-    return false;
+    return QObject::event(e);
 }
 
 Worker::Worker()

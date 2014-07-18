@@ -48,7 +48,6 @@ class WorkerObject : public QObject
     }
     ~WorkerObject()
     {
-        qDebug() << "~WorkerObject()";
     }
 
 public:
