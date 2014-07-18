@@ -8,7 +8,7 @@ QT += opengl core gui
 QMAKE_CXXFLAGS += -Werror -Wextra
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
 
-INCLUDEPATH += ./external/include/
+INCLUDEPATH += ./external/include/ ./src/
 
 LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --libs libavdevicefire libavutilfire libavcodecfire libavfilterfire`
 
@@ -26,11 +26,11 @@ SOURCES += src/main.cpp \
            src/subtitleseditor.cpp \
            src/x11widget.cpp \
            src/ffmpeg/ffavdictionary.cpp \
-           src/playlist_view.cpp \
-           src/playlist_data_model.cpp \
-           src/playlist_item.cpp \
-           src/playlist_item_top.cpp \
-           src/playlist_item_file.cpp \
+           src/playlist/playlist_view.cpp \
+           src/playlist/playlist_data_model.cpp \
+           src/playlist/playlist_item.cpp \
+           src/playlist/playlist_item_top.cpp \
+           src/playlist/playlist_item_file.cpp \
            src/worker.cpp
 
 HEADERS += \
@@ -45,9 +45,9 @@ HEADERS += \
            src/subtitleseditor.h \
            src/x11widget.h \
            src/ffmpeg/ffavdictionary.h \
-           src/playlist_view.h \
-           src/playlist_data_model.h \
-           src/playlist_item.h \
-           src/playlist_item_top.h \
-           src/playlist_item_file.h \
+           src/playlist/playlist_view.h \
+           src/playlist/playlist_data_model.h \
+           src/playlist/playlist_item.h \
+           src/playlist/playlist_item_top.h \
+           src/playlist/playlist_item_file.h \
            src/worker.h

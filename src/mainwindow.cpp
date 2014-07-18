@@ -31,7 +31,7 @@
 #include "subtitleseditor.h"
 #include "playermanager.h"
 #include "ffengine.h"
-#include "playlist_view.h"
+#include "playlist/playlist_view.h"
 
 void MainWindow::createCentralWidget()
 {
