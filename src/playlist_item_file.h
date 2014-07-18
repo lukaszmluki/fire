@@ -14,7 +14,7 @@
 class PlaylistItemFile : public PlaylistItem
 {
 public:
-    PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model);
+    PlaylistItemFile(PlaylistItem *parent, PlaylistDataModel *model);
     ~PlaylistItemFile();
 
     PlaylistItem* child(int row);

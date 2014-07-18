@@ -13,8 +13,8 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-PlaylistItemFile::PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model) :
-    PlaylistItem(data, parent, model)
+PlaylistItemFile::PlaylistItemFile(PlaylistItem *parent, PlaylistDataModel *model) :
+    PlaylistItem(parent, model)
 {
 }
 
@@ -24,23 +24,24 @@ PlaylistItemFile::~PlaylistItemFile()
 
 bool PlaylistItemFile::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 {
-    if (i1->itemData().m_haveChildren != i2->itemData().m_haveChildren)
-        return i1->itemData().m_haveChildren;
-    return i1->itemData().m_name < i2->itemData().m_name;
+    if (i1->haveChildren() != i2->haveChildren())
+        return i1->haveChildren();
+    return i1->name() < i2->name();
 }
 
 void PlaylistItemFile::fetch(QList<PlaylistItem *> &newData)
 {
     const AVIODirEntry *next = NULL;
     AVIOContext *avioCtx;
-    QString childUrl;
-    qDebug() << "listing... " << m_itemData.m_url;
-    if (avio_open_dir(&avioCtx, m_itemData.m_url.toUtf8().constData(), NULL, NULL) >= 0) {
+    PlaylistItem *item;
+    qDebug() << "listing... " << m_url;
+    if (avio_open_dir(&avioCtx, url().toUtf8().constData(), NULL, NULL) >= 0) {
         while ((avio_read_dir(avioCtx, &next) >= 0) && next) {
-            childUrl = m_itemData.m_url + (m_itemData.m_url.endsWith("/") ? "" : "/") + next->name;
-            newData.push_front(new PlaylistItemFile(
-                PlaylistItemData(QString::fromUtf8(next->name), childUrl, next->type == AVIO_ENTRY_DIRECTORY),
-                static_cast<PlaylistItem *>(this), m_model));
+            item = new PlaylistItemFile(static_cast<PlaylistItem *>(this), m_model);
+            item->setName(QString::fromUtf8(next->name));
+            item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + next->name);
+            item->setItemType(next->type == AVIO_ENTRY_DIRECTORY ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
+            newData.push_front(item);
         }
         avio_close_dir(avioCtx);
         qSort(newData.begin(), newData.end(), &compare);

@@ -39,6 +39,6 @@ void PlaylistItem::asynchFetch()
     if (m_fetchCalled)
         return;
     m_fetchCalled = true;
-    if (m_itemData.m_haveChildren)
+    if (haveChildren())
         Worker::shared().dispatch(staticAsyncFetch, new FetchData(this), this, SLOT(fetched(void *)));
 }

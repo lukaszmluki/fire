@@ -12,10 +12,19 @@
 #include <QDir>
 
 PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
-    PlaylistItem(PlaylistItemData("Sources", "", true), NULL, model)
+    PlaylistItem(NULL, model)
 {
-    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("Home", QDir::homePath(), true), this, model));
-    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("System", "/", true), this, model));
+    setName("sources");
+    PlaylistItem *item = new PlaylistItemFile(this, model);
+    item->setName(tr("Home"));
+    item->setItemType(PLAYLIST_ITEM_DIRECTORY);
+    item->setUrl(QDir::homePath());
+    m_childItems.push_back(item);
+    item = new PlaylistItemFile(this, model);
+    item->setName(tr("System"));
+    item->setItemType(PLAYLIST_ITEM_DIRECTORY);
+    item->setUrl("/");
+    m_childItems.push_back(item);
 }
 
 PlaylistItemTop::~PlaylistItemTop()

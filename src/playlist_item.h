@@ -18,13 +18,6 @@ class PlaylistDataModel;
 class PlaylistItemData
 {
 public:
-    PlaylistItemData(const QString &name, const QString &url, bool haveChildren) :
-        m_name(name),
-        m_url(url),
-        m_haveChildren(haveChildren)
-    {
-    }
-
     int columnCount() const
     {
         return 1;
@@ -37,16 +30,20 @@ public:
     }
 
     QString m_name;
-    QString m_url;
-    bool m_haveChildren;
 };
 
 class PlaylistItem : public QObject
 {
     Q_OBJECT
 public:
-    PlaylistItem(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model) :
-        m_itemData(data),
+
+    enum PlaylistItemType {
+        PLAYLIST_ITEM_DIRECTORY,
+        PLAYLIST_ITEM_FILE,
+        PLAYLIST_ITEM_CATEGORY
+    };
+
+    PlaylistItem(PlaylistItem *parent, PlaylistDataModel *model) :
         m_parentItem(parent),
         m_model(model),
         m_fetchCalled(false)
@@ -63,7 +60,7 @@ public:
         return m_itemData.columnCount();
     }
 
-    PlaylistItem *parent()
+    PlaylistItem *parent() const
     {
         return m_parentItem;
     }
@@ -80,11 +77,6 @@ public:
         return 0;
     }
 
-    const PlaylistItemData& itemData() const
-    {
-        return m_itemData;
-    }
-
     void setModelIndex(const QModelIndex &modelIndex)
     {
         m_modelIndex = modelIndex;
@@ -95,9 +87,39 @@ public:
         return m_modelIndex;
     }
 
+    void setUrl(const QString url)
+    {
+        m_url = url;
+    }
+
+    QString url() const
+    {
+        return m_url;
+    }
+
+    void setItemType(PlaylistItemType type)
+    {
+        m_itemType = type;
+    }
+
+    PlaylistItemType itemType() const
+    {
+        return m_itemType;
+    }
+
     bool haveChildren() const
     {
-        return m_itemData.m_haveChildren;
+        return m_itemType == PLAYLIST_ITEM_DIRECTORY ;
+    }
+
+    void setName(const QString &name)
+    {
+        m_itemData.m_name = name;
+    }
+
+    QString name() const
+    {
+        return m_itemData.m_name;
     }
 
     virtual PlaylistItem *child(int row) = 0;
@@ -117,6 +139,8 @@ protected:
     PlaylistItem *m_parentItem;
     PlaylistDataModel *m_model;
     QModelIndex m_modelIndex;
+    QString m_url;
+    PlaylistItemType m_itemType;
 
 private:
     static void staticAsyncFetch(void *);
