@@ -13,8 +13,8 @@ extern "C" {
 #include <libavformat/avformat.h>
 }
 
-PlaylistItemFile::PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent) :
-    PlaylistItem(data, parent)
+PlaylistItemFile::PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model) :
+    PlaylistItem(data, parent, model)
 {
 }
 
@@ -29,11 +29,8 @@ bool PlaylistItemFile::compare(const PlaylistItem *i1, const PlaylistItem *i2)
     return i1->itemData().m_name < i2->itemData().m_name;
 }
 
-void PlaylistItemFile::fetch()
+void PlaylistItemFile::fetch(QList<PlaylistItem *> &newData)
 {
-    m_fetched = true;
-    if (!m_itemData.m_haveChildren)
-        return;
     const AVIODirEntry *next = NULL;
     AVIOContext *avioCtx;
     QString childUrl;
@@ -41,12 +38,12 @@ void PlaylistItemFile::fetch()
     if (avio_open_dir(&avioCtx, m_itemData.m_url.toUtf8().constData(), NULL, NULL) >= 0) {
         while ((avio_read_dir(avioCtx, &next) >= 0) && next) {
             childUrl = m_itemData.m_url + (m_itemData.m_url.endsWith("/") ? "" : "/") + next->name;
-            m_childItems.push_front(new PlaylistItemFile(
+            newData.push_front(new PlaylistItemFile(
                 PlaylistItemData(QString::fromUtf8(next->name), childUrl, next->type == AVIO_ENTRY_DIRECTORY),
-                static_cast<PlaylistItem *>(this)));
+                static_cast<PlaylistItem *>(this), m_model));
         }
         avio_close_dir(avioCtx);
-        qSort(m_childItems.begin(), m_childItems.end(), &compare);
+        qSort(newData.begin(), newData.end(), &compare);
     }
 }
 
@@ -57,8 +54,7 @@ PlaylistItem* PlaylistItemFile::child(int row)
 
 int PlaylistItemFile::childCount()
 {
-    if (!m_fetched)
-        fetch();
+    asynchFetch();
     return m_childItems.count();
 }
 

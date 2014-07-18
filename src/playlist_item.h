@@ -11,6 +11,9 @@
 #include <QList>
 #include <QVariant>
 #include <QString>
+#include <QModelIndex>
+
+class PlaylistDataModel;
 
 class PlaylistItemData
 {
@@ -38,13 +41,15 @@ public:
     bool m_haveChildren;
 };
 
-class PlaylistItem
+class PlaylistItem : public QObject
 {
+    Q_OBJECT
 public:
-    PlaylistItem(const PlaylistItemData &data, PlaylistItem *parent = 0) :
+    PlaylistItem(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model) :
         m_itemData(data),
         m_parentItem(parent),
-        m_fetched(false)
+        m_model(model),
+        m_fetchCalled(false)
     {
     }
 
@@ -80,19 +85,37 @@ public:
         return m_itemData;
     }
 
+    void setModelIndex(const QModelIndex &modelIndex)
+    {
+        m_modelIndex = modelIndex;
+    }
+
+    QModelIndex modelIndex()
+    {
+        return m_modelIndex;
+    }
+
     virtual PlaylistItem *child(int row) = 0;
     virtual int childCount() = 0;
     virtual void fetchMore() = 0;
     virtual bool canFetchMore() = 0;
 
+private slots:
+    void fetched(void *);
+
 protected:
+    virtual void fetch(QList<PlaylistItem *> &newData) = 0;
     void asynchFetch();
-    virtual void fetch() {}
 
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
     PlaylistItem *m_parentItem;
-    bool m_fetched;
+    PlaylistDataModel *m_model;
+    QModelIndex m_modelIndex;
+
+private:
+    static void staticAsyncFetch(void *);
+    bool m_fetchCalled;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_H */

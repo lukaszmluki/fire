@@ -11,7 +11,7 @@
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
-    m_rootItem = new PlaylistItemTop();
+    m_rootItem = new PlaylistItemTop(this);
 }
 
 PlaylistDataModel::~PlaylistDataModel()
@@ -69,8 +69,10 @@ QModelIndex PlaylistDataModel::index(int row, int column, const QModelIndex &par
         parentItem = static_cast<PlaylistItem*>(parent.internalPointer());
 
     PlaylistItem *childItem = parentItem->child(row);
-    if (childItem)
-        return createIndex(row, column, childItem);
+    if (childItem) {
+        childItem->setModelIndex(createIndex(row, column, childItem));
+        return childItem->modelIndex();
+    }
     else
         return QModelIndex();
 }
@@ -102,70 +104,22 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
         parentItem = static_cast<PlaylistItem*>(parent.internalPointer());
 
     return parentItem->childCount();
- }
+}
+
+bool PlaylistDataModel::insertRows(int row, int count, const QModelIndex &parent)
+{
+    beginInsertRows(parent, row, count - 1);
+    endInsertRows();
+    return true;
+}
 
 bool PlaylistDataModel::canFetchMore(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     return false;
-    if (!parent.isValid())
-        return false;
-    PlaylistItem *item = static_cast<PlaylistItem*>(parent.internalPointer());
-    return item->canFetchMore();
 }
 
 void PlaylistDataModel::fetchMore (const QModelIndex &parent)
 {
-    if (parent.isValid()) {
-        PlaylistItem *item = static_cast<PlaylistItem*>(parent.internalPointer());
-        item->fetchMore();
-    }
+    Q_UNUSED(parent)
 }
-
-//void PlaylistDataModel::setupModelData(const QStringList &lines, TreeItem *parent)
-//{
-//     QList<TreeItem*> parents;
-//     QList<int> indentations;
-//     parents << parent;
-//     indentations << 0;
-
-//     int number = 0;
-
-//     while (number < lines.count()) {
-//         int position = 0;
-//         while (position < lines[number].length()) {
-//             if (lines[number].mid(position, 1) != " ")
-//                 break;
-//             position++;
-//         }
-
-//         QString lineData = lines[number].mid(position).trimmed();
-
-//         if (!lineData.isEmpty()) {
-//             // Read the column data from the rest of the line.
-//             QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
-//             QList<QVariant> columnData;
-//             for (int column = 0; column < columnStrings.count(); ++column)
-//                 columnData << columnStrings[column];
-
-//             if (position > indentations.last()) {
-//                 // The last child of the current parent is now the new parent
-//                 // unless the current parent has no children.
-
-//                 if (parents.last()->childCount() > 0) {
-//                     parents << parents.last()->child(parents.last()->childCount()-1);
-//                     indentations << position;
-//                 }
-//             } else {
-//                 while (position < indentations.last() && parents.count() > 0) {
-//                     parents.pop_back();
-//                     indentations.pop_back();
-//                 }
-//             }
-
-//             // Append a new item to the current parent's list of children.
-//             parents.last()->appendChild(new TreeItem(columnData, parents.last()));
-//         }
-
-//         number++;
-//     }
-//}

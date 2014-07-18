@@ -10,10 +10,10 @@
 
 #include <QDebug>
 
-PlaylistItemTop::PlaylistItemTop() :
-    PlaylistItem(PlaylistItemData("Sources", "", true), NULL)
+PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
+    PlaylistItem(PlaylistItemData("Sources", "", true), NULL, model)
 {
-    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("ftp dupa", "ftp://dupa:dupadupa@localhost/", true), this));
+    m_childItems.push_back(new PlaylistItemFile(PlaylistItemData("ftp dupa", "ftp://dupa:dupadupa@localhost/", true), this, model));
 }
 
 PlaylistItemTop::~PlaylistItemTop()
@@ -40,6 +40,7 @@ bool PlaylistItemTop::canFetchMore()
     return false;
 }
 
-void PlaylistItemTop::fetch()
+void PlaylistItemTop::fetch(QList<PlaylistItem *> &newData)
 {
+    Q_UNUSED(newData)
 }

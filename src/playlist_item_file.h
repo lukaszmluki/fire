@@ -14,7 +14,7 @@
 class PlaylistItemFile : public PlaylistItem
 {
 public:
-    PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent = 0);
+    PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent, PlaylistDataModel *model);
     ~PlaylistItemFile();
 
     PlaylistItem* child(int row);
@@ -23,7 +23,7 @@ public:
     bool canFetchMore();
 private:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
-    void fetch();
+    void fetch(QList<PlaylistItem *> &newData);
 };
 
 #endif /* SRC_PLAYLIST_ITEM_FILE_H */

@@ -14,7 +14,7 @@
 class PlaylistItemTop : public PlaylistItem
 {
 public:
-    PlaylistItemTop();
+    PlaylistItemTop(PlaylistDataModel *model);
     ~PlaylistItemTop();
 
     PlaylistItem* child(int row);
@@ -22,7 +22,7 @@ public:
     void fetchMore();
     bool canFetchMore();
 private:
-    void fetch();
+    void fetch(QList<PlaylistItem *> &newData);
 };
 
 #endif /* SRC_PLAYLIST_ITEM_TOP_H */
