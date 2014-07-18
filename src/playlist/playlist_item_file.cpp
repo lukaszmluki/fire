@@ -58,12 +58,3 @@ int PlaylistItemFile::childCount()
     asynchFetch();
     return m_childItems.count();
 }
-
-void PlaylistItemFile::fetchMore()
-{
-}
-
-bool PlaylistItemFile::canFetchMore()
-{
-    return false;
-}

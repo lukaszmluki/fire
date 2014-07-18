@@ -11,6 +11,7 @@
 PlaylistView::PlaylistView(QWidget *parent) :
     QTreeView(parent)
 {
+    setRootIsDecorated(false);
     setHeaderHidden(true);
     setAlternatingRowColors(true);
     setModel(new PlaylistDataModel(this));

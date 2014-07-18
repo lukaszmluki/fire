@@ -31,7 +31,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
     bool canFetchMore(const QModelIndex &parent) const;
-    void fetchMore (const QModelIndex &parent);
+    void fetchMore(const QModelIndex &parent);
 
 private:
     PlaylistItem *m_rootItem;

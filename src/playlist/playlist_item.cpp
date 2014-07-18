@@ -42,3 +42,29 @@ void PlaylistItem::asynchFetch()
     if (haveChildren())
         Worker::shared().dispatch(staticAsyncFetch, new FetchData(this), this, SLOT(fetched(void *)));
 }
+
+void PlaylistItem::fetch(QList<PlaylistItem *> &newData)
+{
+    Q_UNUSED(newData)
+    Q_ASSERT(false);
+}
+
+PlaylistItem* PlaylistItem::child(int row)
+{
+    return m_childItems.at(row);
+}
+
+int PlaylistItem::childCount()
+{
+    return m_childItems.count();
+}
+
+void PlaylistItem::fetchMore()
+{
+    Q_ASSERT(false);
+}
+
+bool PlaylistItem::canFetchMore()
+{
+    return false;
+}

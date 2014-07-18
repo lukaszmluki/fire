@@ -9,7 +9,6 @@
 #define SRC_PLAYLIST_ITEM_FILE_H
 
 #include "playlist_item.h"
-#include <QList>
 
 class PlaylistItemFile : public PlaylistItem
 {
@@ -19,8 +18,6 @@ public:
 
     PlaylistItem* child(int row);
     int childCount();
-    void fetchMore();
-    bool canFetchMore();
 private:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
     void fetch(QList<PlaylistItem *> &newData);

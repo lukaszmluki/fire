@@ -31,7 +31,8 @@ SOURCES += src/main.cpp \
            src/playlist/playlist_item.cpp \
            src/playlist/playlist_item_top.cpp \
            src/playlist/playlist_item_file.cpp \
-           src/worker.cpp
+           src/playlist/playlist_item_category.cpp \
+           src/worker.cpp \
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -50,4 +51,6 @@ HEADERS += \
            src/playlist/playlist_item.h \
            src/playlist/playlist_item_top.h \
            src/playlist/playlist_item_file.h \
-           src/worker.h
+           src/playlist/playlist_item_category.h \
+           src/worker.h \
+

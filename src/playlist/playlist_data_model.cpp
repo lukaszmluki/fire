@@ -39,8 +39,10 @@ QVariant PlaylistDataModel::data(const QModelIndex &index, int role) const
 
     if (role == Qt::DisplayRole) {
         return item->columnData(index.column());
-    } else if (role == Qt::DecorationRole && item->haveChildren()) {
+    } else if (role == Qt::DecorationRole && item->itemType() == PlaylistItem::PLAYLIST_ITEM_DIRECTORY) {
         return QIcon(Utils::imagePath("playlist/dir.png"));
+    } else if (role == Qt::TextAlignmentRole && item->itemType() == PlaylistItem::PLAYLIST_ITEM_CATEGORY) {
+        return Qt::AlignCenter;
     }
     return QVariant();
 }
@@ -49,6 +51,12 @@ Qt::ItemFlags PlaylistDataModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
         return 0;
+
+    PlaylistItem *item = static_cast<PlaylistItem *>(index.internalPointer());
+
+    if (item->itemType() == PlaylistItem::PLAYLIST_ITEM_CATEGORY)
+        return Qt::ItemIsEnabled;
+
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
 }
 

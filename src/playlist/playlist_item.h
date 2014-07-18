@@ -109,7 +109,8 @@ public:
 
     bool haveChildren() const
     {
-        return m_itemType == PLAYLIST_ITEM_DIRECTORY ;
+        return m_itemType == PLAYLIST_ITEM_DIRECTORY ||
+               m_itemType == PLAYLIST_ITEM_CATEGORY;
     }
 
     void setName(const QString &name)
@@ -122,16 +123,16 @@ public:
         return m_itemData.m_name;
     }
 
-    virtual PlaylistItem *child(int row) = 0;
-    virtual int childCount() = 0;
-    virtual void fetchMore() = 0;
-    virtual bool canFetchMore() = 0;
+    virtual PlaylistItem *child(int row);
+    virtual int childCount();
+    virtual void fetchMore();
+    virtual bool canFetchMore();
 
 private slots:
     void fetched(void *);
 
 protected:
-    virtual void fetch(QList<PlaylistItem *> &newData) = 0;
+    virtual void fetch(QList<PlaylistItem *> &newData);
     void asynchFetch();
 
     QList<PlaylistItem *> m_childItems;

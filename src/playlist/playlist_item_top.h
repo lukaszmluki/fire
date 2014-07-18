@@ -9,20 +9,12 @@
 #define SRC_PLAYLIST_ITEM_TOP_H
 
 #include "playlist_item.h"
-#include <QList>
 
 class PlaylistItemTop : public PlaylistItem
 {
 public:
     PlaylistItemTop(PlaylistDataModel *model);
     ~PlaylistItemTop();
-
-    PlaylistItem* child(int row);
-    int childCount();
-    void fetchMore();
-    bool canFetchMore();
-private:
-    void fetch(QList<PlaylistItem *> &newData);
 };
 
 #endif /* SRC_PLAYLIST_ITEM_TOP_H */
