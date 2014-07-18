@@ -20,11 +20,15 @@ extern "C" {
 
 bool FFEngine::initializeFFmpeg()
 {
-    av_register_all();
-    avdevice_register_all();
-    avfilter_register_all();
-    avformat_network_init();
-    //av_log_set_level(AV_LOG_DEBUG);
+    static int initialized = 0;
+    if (!initialized) {
+        initialized = 1;
+        av_register_all();
+        avdevice_register_all();
+        avfilter_register_all();
+        avformat_network_init();
+        //av_log_set_level(AV_LOG_DEBUG);
+    }
     return true;
 }
 
@@ -270,8 +274,6 @@ FFEngine::FFEngine(const QString &videoDevice, const QString &audioDevice,
     m_videoDeviceOptions(videoOptions),
     m_audioDeviceOptions(audioOptions)
 {
-    static bool init = initializeFFmpeg();
-    Q_UNUSED(init);
     connect(this, SIGNAL(requestPacket(int)), SLOT(pushPacket(int)), Qt::QueuedConnection);
 }
 

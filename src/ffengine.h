@@ -25,6 +25,8 @@ class FFEngine : public QObject
     Q_OBJECT
     Q_DISABLE_COPY(FFEngine)
 public:
+    static bool initializeFFmpeg();
+
     typedef QMap<QString, QString> DeviceOptions;
 
     FFEngine(const QString &videoDevice, const QString &audioDevice,
@@ -67,8 +69,6 @@ private slots:
     void pushPacket(int streamIndex);
 
 private:
-    static bool initializeFFmpeg();
-
     static int staticControlMessage(struct AVFormatContext *ctx, int type,
                                     void *data, size_t size);
 

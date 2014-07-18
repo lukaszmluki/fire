@@ -16,7 +16,6 @@ extern "C" {
 PlaylistItemFile::PlaylistItemFile(const PlaylistItemData &data, PlaylistItem *parent) :
     PlaylistItem(data, parent)
 {
-    av_register_all();
 }
 
 PlaylistItemFile::~PlaylistItemFile()

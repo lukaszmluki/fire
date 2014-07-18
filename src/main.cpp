@@ -13,6 +13,7 @@
 //#include "openglwindow.h"
 #include "mainwindow.h"
 #include "preferences.h"
+#include "ffengine.h"
 
 namespace {
 const char *PARAM_WINDOWED = "--windowed";
@@ -48,7 +49,7 @@ void parseArgs(int argc, char **argv)
 int main(int argc, char **argv)
 {
     parseArgs(argc, argv);
-
+    FFEngine::initializeFFmpeg();
     QCoreApplication::setAttribute(Qt::AA_X11InitThreads);
 
     if (Preferences::instance().getViewMode() == Preferences::VIEW_MODE_WINDOWED) {
