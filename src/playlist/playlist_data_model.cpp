@@ -126,14 +126,3 @@ bool PlaylistDataModel::insertRows(int row, int count, const QModelIndex &parent
     endInsertRows();
     return true;
 }
-
-bool PlaylistDataModel::canFetchMore(const QModelIndex &parent) const
-{
-    Q_UNUSED(parent)
-    return false;
-}
-
-void PlaylistDataModel::fetchMore (const QModelIndex &parent)
-{
-    Q_UNUSED(parent)
-}

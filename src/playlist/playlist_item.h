@@ -125,8 +125,6 @@ public:
 
     virtual PlaylistItem *child(int row);
     virtual int childCount();
-    virtual void fetchMore();
-    virtual bool canFetchMore();
 
 private slots:
     void fetched(void *);

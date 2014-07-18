@@ -58,13 +58,3 @@ int PlaylistItem::childCount()
 {
     return m_childItems.count();
 }
-
-void PlaylistItem::fetchMore()
-{
-    Q_ASSERT(false);
-}
-
-bool PlaylistItem::canFetchMore()
-{
-    return false;
-}
