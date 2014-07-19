@@ -22,8 +22,9 @@ void PlaylistItem::fetched(void *data)
 {
     FetchData *fetchData = static_cast<FetchData *>(data);
     if (fetchData->m_newItems.count()) {
+        m_model->beginInsertRows(m_modelIndex, 0, fetchData->m_newItems.count() - 1);
         m_childItems = fetchData->m_newItems;
-        m_model->insertRows(0, m_childItems.count(), m_modelIndex);
+        m_model->endInsertRows();
     }
     delete fetchData;
 }

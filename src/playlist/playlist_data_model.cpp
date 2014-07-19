@@ -121,9 +121,12 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
-bool PlaylistDataModel::insertRows(int row, int count, const QModelIndex &parent)
+void PlaylistDataModel::beginInsertRows(const QModelIndex &parent, int first, int last)
 {
-    beginInsertRows(parent, row, count - 1);
-    endInsertRows();
-    return true;
+    QAbstractItemModel::beginInsertRows(parent, first,last);
+}
+
+void PlaylistDataModel::endInsertRows()
+{
+    QAbstractItemModel::endInsertRows();
 }

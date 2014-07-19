@@ -29,7 +29,8 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    bool insertRows(int row, int count, const QModelIndex & parent = QModelIndex());
+    void beginInsertRows(const QModelIndex &parent, int first, int last);
+    void endInsertRows();
 
 private:
     PlaylistItem *m_rootItem;
