@@ -24,7 +24,6 @@ public:
     ~OpenGLWidget();
 
 protected:
-    bool event(QEvent *event);
     void paintEvent(QPaintEvent *event);
     void resizeEvent(QResizeEvent *event);
 

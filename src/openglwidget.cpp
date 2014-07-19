@@ -54,11 +54,6 @@ void OpenGLWidget::fillWithColor(const QColor &color)
     swapBuffer();
 }
 
-bool OpenGLWidget::event(QEvent *event)
-{
-    return QGLWidget::event(event);
-}
-
 void OpenGLWidget::resizeEvent(QResizeEvent *event)
 {
     PlayerManager::instance().getPlayer(this)->resize(event->size());
