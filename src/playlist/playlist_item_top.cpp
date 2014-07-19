@@ -7,30 +7,28 @@
 
 #include "playlist_item_top.h"
 #include <QDebug>
-#include <QDir>
 #include "playlist_item_file.h"
 #include "playlist_item_category.h"
+#include "playlist_source.h"
 
 PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
     PlaylistItem(NULL, model)
 {
     setName("sources");
 
-    PlaylistItemCategory *category;
-    category = new PlaylistItemCategory(tr("System"), this, model);
-    m_childItems.push_back(category);
-
-    PlaylistItem *item = new PlaylistItemFile(category, model);
-    item->setName(tr("Home"));
-    item->setItemType(PLAYLIST_ITEM_DIRECTORY);
-    item->setUrl(QDir::homePath());
-    category->addPlaylistItem(item);
-
-    item = new PlaylistItemFile(category, model);
-    item->setName(tr("System"));
-    item->setItemType(PLAYLIST_ITEM_DIRECTORY);
-    item->setUrl("/");
-    category->addPlaylistItem(item);
+    QList<PlaylistSourceCategory> sources = PlaylistSource::instance().getSources();
+    Q_FOREACH(const PlaylistSourceCategory &category, sources) {
+        PlaylistItemCategory *newCategory;
+        newCategory = new PlaylistItemCategory(category.m_category, this, model);
+        m_childItems.push_back(newCategory);
+        Q_FOREACH(const PlaylistSourceDetail &source, category.m_sources) {
+            PlaylistItem *item = new PlaylistItemFile(newCategory, model);
+            item->setName(source.m_name);
+            item->setUrl(source.m_url);
+            item->setItemType(PLAYLIST_ITEM_DIRECTORY);
+            newCategory->addPlaylistItem(item);
+        }
+    }
 }
 
 PlaylistItemTop::~PlaylistItemTop()

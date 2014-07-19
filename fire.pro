@@ -32,6 +32,7 @@ SOURCES += src/main.cpp \
            src/playlist/playlist_item_top.cpp \
            src/playlist/playlist_item_file.cpp \
            src/playlist/playlist_item_category.cpp \
+           src/playlist/playlist_source.cpp \
            src/worker.cpp \
 
 HEADERS += \
@@ -52,5 +53,5 @@ HEADERS += \
            src/playlist/playlist_item_top.h \
            src/playlist/playlist_item_file.h \
            src/playlist/playlist_item_category.h \
+           src/playlist/playlist_source.h \
            src/worker.h \
-
