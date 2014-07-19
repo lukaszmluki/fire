@@ -130,3 +130,14 @@ void PlaylistDataModel::endInsertRows()
 {
     QAbstractItemModel::endInsertRows();
 }
+
+QString PlaylistDataModel::category(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return QString();
+
+    const PlaylistItem *item = static_cast<PlaylistItem*>(index.internalPointer());
+    while (item->itemType() != PlaylistItem::PLAYLIST_ITEM_CATEGORY)
+        item = item->parent();
+    return item->name();
+}

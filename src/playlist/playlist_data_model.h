@@ -32,6 +32,8 @@ public:
     void beginInsertRows(const QModelIndex &parent, int first, int last);
     void endInsertRows();
 
+    QString category(const QModelIndex &index) const;
+
 private:
     PlaylistItem *m_rootItem;
 };
