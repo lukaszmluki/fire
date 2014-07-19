@@ -265,6 +265,8 @@ MainWindow::MainWindow(QWidget *parent) :
     m_splitterVideoPlaylistArea = new QSplitter(Qt::Horizontal);
     m_splitterVideoPlaylistArea->addWidget(m_playlistArea);
     m_splitterVideoPlaylistArea->addWidget(m_videoArea);
+    m_splitterVideoPlaylistArea->setStretchFactor(0, 0);
+    m_splitterVideoPlaylistArea->setStretchFactor(1, 1);
 
     m_splitterVideoSubtitlesArea = new QSplitter(Qt::Vertical);
     m_splitterVideoSubtitlesArea->addWidget(new QWidget());
@@ -282,7 +284,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setCentralWidget(m_centralWidget);
 
     //restore geometry of the window
-    const QByteArray &geometry = Preferences::instance().getValue("Window/geometry", QByteArray()).toByteArray();
+    const QByteArray &geometry = Preferences::instance().getValue("Window/window_geometry", QByteArray()).toByteArray();
     if (geometry.isEmpty()) {
         setGeometry(0, 0, 640, 480);
         m_splitterVideoPlaylistArea->setSizes(QList<int>() << 140 << 500);
@@ -369,14 +371,14 @@ QAction* MainWindow::addMenuAction(QMenu *menu, const QString &iconFile, const Q
 void MainWindow::resizeEvent(QResizeEvent *e)
 {
     QMainWindow::resizeEvent(e);
-    Preferences::instance().setValue("Window/geometry", saveGeometry());
+    Preferences::instance().setValue("Window/window_geometry", saveGeometry());
     saveSplitterState(0, 0);
 }
 
 void MainWindow::moveEvent(QMoveEvent *e)
 {
     QMainWindow::moveEvent(e);
-    Preferences::instance().setValue("Window/geometry", saveGeometry());
+    Preferences::instance().setValue("Window/window_geometry", saveGeometry());
     saveSplitterState(0, 0);
 }
 
