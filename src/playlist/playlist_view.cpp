@@ -15,4 +15,5 @@ PlaylistView::PlaylistView(QWidget *parent) :
     setHeaderHidden(true);
     setAlternatingRowColors(true);
     setModel(new PlaylistDataModel(this));
+    expandToDepth(0);
 }
