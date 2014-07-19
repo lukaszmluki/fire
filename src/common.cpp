@@ -10,10 +10,24 @@
 #include <QDir>
 #include "preferences.h"
 
+namespace {
+const QString VIDEO_FILTER = QObject::tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv;;All files (*.*)");
+//TODO: configurable
+const QStringList MOVIE_EXTENSIONS = QStringList() << "avi"  << "mp4" << "mkv" <<
+                                                      "asf"  << "flv" << "m4v" <<
+                                                      "mov"  << "swf" << "vob" <<
+                                                      "mpeg" << "mpg" << "wmv" <<
+                                                      "rmvb";
+}
+
 namespace Utils {
 
 const QString APPLICATION_NAME("Fire Player");
-const QString VIDEO_FILTER = QObject::tr("Video files *.avi *.mp4 *.mkv *.mpeg *.mpg *.wmv;;All files (*.*)");
+
+const QStringList& movieExtentions()
+{
+    return MOVIE_EXTENSIONS;
+}
 
 QString imagePath(const QString &file)
 {

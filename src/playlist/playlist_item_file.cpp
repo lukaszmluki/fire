@@ -8,6 +8,7 @@
 #include "playlist_item_file.h"
 #include <QDebug>
 #include <QDir>
+#include "common.h"
 extern "C" {
 #include <libavformat/avio.h>
 #include <libavformat/avformat.h>
@@ -37,6 +38,10 @@ void PlaylistItemFile::fetch(QList<PlaylistItem *> &newData)
     qDebug() << "listing... " << m_url;
     if (avio_open_dir(&avioCtx, url().toUtf8().constData(), NULL, NULL) >= 0) {
         while ((avio_read_dir(avioCtx, &next) >= 0) && next) {
+            if (next->type != AVIO_ENTRY_DIRECTORY) {
+                if (!Utils::movieExtentions().contains(QFileInfo(next->name).suffix(), Qt::CaseInsensitive))
+                    continue;
+            }
             item = new PlaylistItemFile(static_cast<PlaylistItem *>(this), m_model);
             item->setName(QString::fromUtf8(next->name));
             item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + next->name);
