@@ -119,6 +119,7 @@ void MainWindow::createVideoArea()
     m_videoArea = new QWidget();
     m_videoArea->setLayout(layout);
     m_videoArea->setMinimumSize(100,100);
+    m_videoArea->setStyleSheet("background-color:black;");
 
     Preferences::RenderingEngine renderingEngine = Preferences::instance().getRenderingEngine();
 
