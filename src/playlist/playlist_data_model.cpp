@@ -84,7 +84,8 @@ QModelIndex PlaylistDataModel::index(int row, int column, const QModelIndex &par
 
     PlaylistItem *childItem = parentItem->child(row);
     if (childItem) {
-        childItem->setModelIndex(createIndex(row, column, childItem));
+        if (!childItem->modelIndex().isValid())
+            childItem->setModelIndex(createIndex(row, column, childItem));
         return childItem->modelIndex();
     }
     else

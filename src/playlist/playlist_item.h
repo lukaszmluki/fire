@@ -11,7 +11,7 @@
 #include <QList>
 #include <QVariant>
 #include <QString>
-#include <QModelIndex>
+#include <QPersistentModelIndex>
 
 class PlaylistDataModel;
 
@@ -82,7 +82,7 @@ public:
         m_modelIndex = modelIndex;
     }
 
-    QModelIndex modelIndex() const
+    QPersistentModelIndex modelIndex() const
     {
         return m_modelIndex;
     }
@@ -137,7 +137,7 @@ protected:
     PlaylistItemData m_itemData;
     PlaylistItem *m_parentItem;
     PlaylistDataModel *m_model;
-    QModelIndex m_modelIndex;
+    QPersistentModelIndex m_modelIndex;
     QString m_url;
     PlaylistItemType m_itemType;
 
