@@ -9,10 +9,6 @@
 #include <QDebug>
 #include <QDir>
 #include "common.h"
-extern "C" {
-#include <libavformat/avio.h>
-#include <libavformat/avformat.h>
-}
 
 PlaylistItemFile::PlaylistItemFile(PlaylistItem *parent, PlaylistDataModel *model) :
     PlaylistItem(parent, model)
@@ -32,24 +28,20 @@ bool PlaylistItemFile::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 
 void PlaylistItemFile::fetch(QList<PlaylistItem *> &newData)
 {
-    const AVIODirEntry *next = NULL;
-    AVIOContext *avioCtx;
+    QDir dir(m_url);
     PlaylistItem *item;
     qDebug() << "listing... " << m_url;
-    if (avio_open_dir(&avioCtx, url().toUtf8().constData(), NULL, NULL) >= 0) {
-        while ((avio_read_dir(avioCtx, &next) >= 0) && next) {
-            if (next->type != AVIO_ENTRY_DIRECTORY) {
-                if (!Utils::movieExtentions().contains(QFileInfo(next->name).suffix(), Qt::CaseInsensitive))
-                    continue;
-            }
-            item = new PlaylistItemFile(static_cast<PlaylistItem *>(this), m_model);
-            item->setName(QString::fromUtf8(next->name));
-            item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + next->name);
-            item->setItemType(next->type == AVIO_ENTRY_DIRECTORY ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
-            newData.push_front(item);
-        }
-        avio_close_dir(avioCtx);
-        qSort(newData.begin(), newData.end(), &compare);
+    const QFileInfoList &list = dir.entryInfoList(QDir::Files  | QDir::Dirs   | QDir::NoDotDot | QDir::NoDot |
+                                                  QDir::Drives | QDir::Hidden | QDir::System   | QDir::Readable,
+                                                  QDir::DirsFirst | QDir::Name);
+    Q_FOREACH(const QFileInfo &entry, list) {
+        if (!entry.isDir() && !Utils::movieExtentions().contains(entry.suffix(), Qt::CaseInsensitive))
+            continue;
+        item = new PlaylistItemFile(static_cast<PlaylistItem *>(this), m_model);
+        item->setName(entry.fileName());
+        item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + entry.fileName());
+        item->setItemType(entry.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
+        newData.push_back(item);
     }
 }
 
