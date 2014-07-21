@@ -124,9 +124,9 @@ void MainWindow::createVideoArea()
     Preferences::RenderingEngine renderingEngine = Preferences::instance().getRenderingEngine();
 
     if (renderingEngine == Preferences::RENDERING_ENGINE_OPENGL) {
-        m_videoWidget = new OpenGLWidget();
+        m_videoWidget = new OpenGLWidget(PlayerManager::MAIN_PLAYER);
     } else if (renderingEngine == Preferences::RENDERING_ENGINE_X11) {
-        m_videoWidget = new X11Widget();
+        m_videoWidget = new X11Widget(PlayerManager::MAIN_PLAYER);
     }
 
     if (m_videoWidget)
@@ -303,7 +303,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle(Utils::APPLICATION_NAME);
 
     //register player
-    FFEngine *player = PlayerManager::instance().registerPlayer(m_videoWidget);
+    FFEngine *player = PlayerManager::instance().registerPlayer(m_videoWidget, PlayerManager::MAIN_PLAYER);
     player->addGuiDelegate(this);
 
 //    connect(m_subtitlesEditor, SIGNAL(fileNameTextChanged(const QString&)), this, SLOT(changeEditorFileName(const QString &)));
@@ -433,7 +433,7 @@ void MainWindow::loadVideo()
     }
     Preferences::instance().setLastDir(filename);
 
-    PlayerManager::instance().getPlayer(m_videoWidget)->openMedia(filename);
+    PlayerManager::instance().getPlayer(PlayerManager::MAIN_PLAYER)->openMedia(filename);
 
 //    filename = filename.left(filename.lastIndexOf(".")) + "txt";
 //    if (QFile::exists(filename)) {
@@ -454,7 +454,7 @@ void MainWindow::stop()
 
 void MainWindow::togglePause()
 {
-    PlayerManager::instance().getPlayer(m_videoWidget)->togglePause();
+    PlayerManager::instance().getPlayer(PlayerManager::MAIN_PLAYER)->togglePause();
 }
 
 void MainWindow::paused()
@@ -480,18 +480,18 @@ void MainWindow::positionChanged(double position)
 
 void MainWindow::positionSliderChanged(int position)
 {
-    PlayerManager::instance().getPlayer(m_videoWidget)->seek(position);
+    PlayerManager::instance().getPlayer(PlayerManager::MAIN_PLAYER)->seek(position);
 }
 
 void MainWindow::volumeSliderChanged(int volume)
 {
     if (m_volumeSlider->isSliderDown())
-        PlayerManager::instance().getPlayer(m_videoWidget)->setVolume(static_cast<double>(volume) / 100.0);
+        PlayerManager::instance().getPlayer(PlayerManager::MAIN_PLAYER)->setVolume(static_cast<double>(volume) / 100.0);
 }
 
 void MainWindow::muteButtonClicked()
 {
-    PlayerManager::instance().getPlayer(m_videoWidget)->toggleMute();
+    PlayerManager::instance().getPlayer(PlayerManager::MAIN_PLAYER)->toggleMute();
 }
 
 void MainWindow::muteChanged(int mute)

@@ -11,6 +11,7 @@
 #include <QGLWidget>
 #include <QEvent>
 #include "videowidget.h"
+#include "playermanager.h"
 
 class QResizeEvent;
 class QPaintEvent;
@@ -20,7 +21,7 @@ class OpenGLWidget : public QGLWidget, public VideoWidget
     Q_OBJECT
     Q_DISABLE_COPY(OpenGLWidget)
 public:
-    OpenGLWidget(QWidget *parent = 0);
+    OpenGLWidget(PlayerManager::PlayerLocalization localization, QWidget *parent = 0);
     ~OpenGLWidget();
 
 protected:
@@ -38,6 +39,7 @@ public:
 
 private:
     void fillWithColor(const QColor &color = Qt::black);
+    PlayerManager::PlayerLocalization m_localization;
 };
 
 #endif /* SRC_OPENGL_WIDGET_H */

@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QEvent>
 #include "videowidget.h"
+#include "playermanager.h"
 
 class QResizeEvent;
 class QPaintEvent;
@@ -20,7 +21,7 @@ class X11Widget : public QWidget, public VideoWidget
     Q_OBJECT
     Q_DISABLE_COPY(X11Widget)
 public:
-    X11Widget(QWidget *parent = 0);
+    X11Widget(PlayerManager::PlayerLocalization localization, QWidget *parent = 0);
     ~X11Widget();
 
 protected:
@@ -39,6 +40,7 @@ public:
 
 private:
     void fillWithColor(const QColor &color = Qt::black);
+    PlayerManager::PlayerLocalization m_localization;
 };
 
 #endif /* SRC_X11_WIDGET_H */

@@ -9,11 +9,11 @@
 #include <QDebug>
 #include <QPaintEvent>
 #include <QPainter>
-#include "playermanager.h"
 #include "ffengine.h"
 
-X11Widget::X11Widget(QWidget *parent) :
-    QWidget(parent)
+X11Widget::X11Widget(PlayerManager::PlayerLocalization localization, QWidget *parent) :
+    QWidget(parent),
+    m_localization(localization)
 {
     setAutoFillBackground(false);
     setAttribute(Qt::WA_NoSystemBackground);
@@ -60,10 +60,10 @@ void X11Widget::resizeEvent(QResizeEvent *event)
 
 void X11Widget::paintEvent(QPaintEvent *event)
 {
-    if (!PlayerManager::instance().getPlayer(this)->isMediaOpened())
+    if (!PlayerManager::instance().getPlayer(m_localization)->isMediaOpened())
         fillWithColor();
     else
-        PlayerManager::instance().getPlayer(this)->repaint(event->rect());
+        PlayerManager::instance().getPlayer(m_localization)->repaint(event->rect());
     event->accept();
 }
 

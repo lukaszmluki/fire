@@ -12,11 +12,11 @@
 #include <QWaitCondition>
 #include <QMutex>
 #include <QPaintEvent>
-#include "playermanager.h"
 #include "ffengine.h"
 
-OpenGLWidget::OpenGLWidget(QWidget *parent) :
-    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent)
+OpenGLWidget::OpenGLWidget(PlayerManager::PlayerLocalization localization, QWidget *parent) :
+    QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DoubleBuffer | QGL::NoDepthBuffer), parent),
+    m_localization(localization)
 {
     setAutoFillBackground(false);
 }
@@ -56,13 +56,13 @@ void OpenGLWidget::fillWithColor(const QColor &color)
 
 void OpenGLWidget::resizeEvent(QResizeEvent *event)
 {
-    PlayerManager::instance().getPlayer(this)->resize(event->size());
+    PlayerManager::instance().getPlayer(m_localization)->resize(event->size());
     event->accept();
 }
 
 void OpenGLWidget::paintEvent(QPaintEvent *event)
 {
-    if (!PlayerManager::instance().getPlayer(this)->isMediaOpened())
+    if (!PlayerManager::instance().getPlayer(m_localization)->isMediaOpened())
         fillWithColor();
     event->accept();
 }

@@ -26,10 +26,56 @@ PlayerManager& PlayerManager::instance()
     return instance;
 }
 
-FFEngine* PlayerManager::registerPlayer(VideoWidget *window)
+const PlayerManager::PlayerDesciption* PlayerManager::findDescription(const VideoWidget *videoWidget) const
 {
-    if (m_players.contains(window))
-        return getPlayer(window);
+    ConstPlayersIterator it = m_players.begin();
+    for (; it != m_players.end(); ++it) {
+        if (it->m_videoWidget == videoWidget)
+            return &(*it);
+    }
+    return NULL;
+}
+
+const PlayerManager::PlayerDesciption* PlayerManager::findDescription(const FFEngine *engine) const
+{
+    ConstPlayersIterator it = m_players.begin();
+    for (; it != m_players.end(); ++it) {
+        if (it->m_engine == engine)
+            return &(*it);
+    }
+    return NULL;
+}
+
+const PlayerManager::PlayerDesciption* PlayerManager::findDescription(const PlayerLocalization localization) const
+{
+    ConstPlayersIterator it = m_players.begin();
+    for (; it != m_players.end(); ++it) {
+        if (it->m_localization == localization)
+            return &(*it);
+    }
+    return NULL;
+}
+
+
+bool PlayerManager::hasPlayer(const VideoWidget *videoWidget) const
+{
+    return findDescription(videoWidget) != NULL;
+}
+
+bool PlayerManager::hasPlayer(const FFEngine *engine) const
+{
+    return findDescription(engine) != NULL;
+}
+
+bool PlayerManager::hasPlayer(const PlayerLocalization localization) const
+{
+    return findDescription(localization) != NULL;
+}
+
+FFEngine* PlayerManager::registerPlayer(VideoWidget *window, PlayerLocalization localization)
+{
+    if (hasPlayer(window))
+        return NULL;
 
     QObject *qo = dynamic_cast<QObject *>(window);
     if (!qo) {
@@ -53,42 +99,44 @@ FFEngine* PlayerManager::registerPlayer(VideoWidget *window)
         return NULL;
     }
 
-    FFEngine *engine = new FFEngine(videoDevice, audioDevice, videoOptions, audioOptions, qo);
+    PlayerDesciption desc;
+    desc.m_engine = new FFEngine(videoDevice, audioDevice, videoOptions, audioOptions, qo);
+    desc.m_videoWidget = window;
+    desc.m_localization = localization;
 
-    m_players.insert(window, engine);
+    m_players.prepend(desc);
 
-    QObject::connect(engine, SIGNAL(prepareBuffer()), qo, SLOT(prepareBuffer()), Qt::DirectConnection);
-    QObject::connect(engine, SIGNAL(swapBuffer()), qo, SLOT(swapBuffer()), Qt::DirectConnection);
+    QObject::connect(desc.m_engine, SIGNAL(prepareBuffer()), qo, SLOT(prepareBuffer()), Qt::DirectConnection);
+    QObject::connect(desc.m_engine, SIGNAL(swapBuffer()), qo, SLOT(swapBuffer()), Qt::DirectConnection);
 
-    return engine;
+    return desc.m_engine;
 }
 
 bool PlayerManager::unregisterPlayer(VideoWidget *window)
 {
-    delete m_players.value(window, NULL);
-    return m_players.remove(window);
-}
-
-bool PlayerManager::unregisterPlayer(FFEngine *player)
-{
     PlayersIterator it = m_players.begin();
-    while (it != m_players.end()) {
-        if (it.value() == player) {
-            delete player;
+    for (; it != m_players.end(); ++it) {
+        if (it->m_videoWidget == window) {
+            delete it->m_engine;
             m_players.erase(it);
             return true;
         }
-        ++it;
     }
     return false;
 }
 
 VideoWidget* PlayerManager::getWindow(FFEngine *player)
 {
-    return m_players.key(player);
+    const PlayerDesciption *desc = findDescription(player);
+    if (!desc)
+        return NULL;
+    return desc->m_videoWidget;
 }
 
-FFEngine* PlayerManager::getPlayer(VideoWidget *window)
+FFEngine* PlayerManager::getPlayer(PlayerLocalization localization)
 {
-    return m_players.value(window, NULL);
+    const PlayerDesciption *desc = findDescription(localization);
+    if (!desc)
+        return NULL;
+    return desc->m_engine;
 }
