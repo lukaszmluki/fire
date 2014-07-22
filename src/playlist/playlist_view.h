@@ -21,6 +21,7 @@ public:
 private:
     void showDirectoryContextMenu(const QModelIndex &index, const QPoint &point) const;
     void showFileContextMenu(const QModelIndex &index, const QPoint &point) const;
+    void addShortcut(const QString &url, const QString &name);
 
 signals:
 
@@ -28,6 +29,9 @@ public slots:
 
 private slots:
     void customContextMenuRequest(const QPoint &point) const;
+    void addShortcut();
+    void addShortcutNamed();
+
 };
 
 #endif /* SRC_PLAYLIST_H */

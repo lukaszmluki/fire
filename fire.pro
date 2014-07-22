@@ -5,7 +5,7 @@ VERSION = 0.0.1
 CONFIG += debug
 QT += opengl core gui
 
-QMAKE_CXXFLAGS += -Werror -Wextra
+QMAKE_CXXFLAGS += -Werror -Wextra -std=c++11
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
 
 INCLUDEPATH += ./external/include/ ./src/
@@ -34,6 +34,7 @@ SOURCES += src/main.cpp \
            src/playlist/playlist_item_category.cpp \
            src/playlist/playlist_source.cpp \
            src/worker.cpp \
+    src/window/playlist_source_add_window.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -55,3 +56,4 @@ HEADERS += \
            src/playlist/playlist_item_category.h \
            src/playlist/playlist_source.h \
            src/worker.h \
+    src/window/playlist_source_add_window.h

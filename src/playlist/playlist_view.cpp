@@ -12,6 +12,7 @@
 #include <QModelIndex>
 #include "playlist_data_model.h"
 #include "playlist_item.h"
+#include "window/playlist_source_add_window.h"
 
 PlaylistView::PlaylistView(QWidget *parent) :
     QTreeView(parent)
@@ -26,14 +27,40 @@ PlaylistView::PlaylistView(QWidget *parent) :
     connect(this, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(customContextMenuRequest(const QPoint &)));
 }
 
+void PlaylistView::addShortcut(const QString &url, const QString &name)
+{
+    PlaylistSourceAddWindow *dialog = new PlaylistSourceAddWindow(name, url, this);
+    dialog->exec();
+    dialog->deleteLater();
+}
+
+void PlaylistView::addShortcut()
+{
+    QVariant data = dynamic_cast<QAction *>(sender())->data();
+    const PlaylistItem *item = static_cast<PlaylistItem *>(data.value<void*>());
+    addShortcut(item->url(), QString());
+}
+
+void PlaylistView::addShortcutNamed()
+{
+    QVariant data = dynamic_cast<QAction *>(sender())->data();
+    const PlaylistItem *item = static_cast<PlaylistItem *>(data.value<void*>());
+    addShortcut(item->url(), item->name());
+}
+
 void PlaylistView::showDirectoryContextMenu(const QModelIndex &index, const QPoint &point) const
 {
     PlaylistItem *item = static_cast<PlaylistItem *>(index.internalPointer());
-    QMenu *contextMenu = new QMenu();
-    contextMenu->addAction("Add as shortcut");
-    contextMenu->addAction("Add as shortcut \"" + item->name() + "\"");
-    contextMenu->exec(mapToGlobal(point) + QPoint(3, 3));
-    delete contextMenu;
+    if (item->parent()->itemType() != PlaylistItem::PLAYLIST_ITEM_CATEGORY) {
+        QAction *a;
+        QMenu *contextMenu = new QMenu();
+        a = contextMenu->addAction("Add as shortcut", this, SLOT(addShortcut()));
+        a->setData(QVariant::fromValue(index.internalPointer()));
+        a = contextMenu->addAction("Add as shortcut \"" + item->name() + "\"", this, SLOT(addShortcutNamed()));
+        a->setData(QVariant::fromValue(index.internalPointer()));
+        contextMenu->exec(mapToGlobal(point) + QPoint(3, 3));
+        contextMenu->deleteLater();
+    }
 }
 
 void PlaylistView::showFileContextMenu(const QModelIndex &index, const QPoint &point) const
