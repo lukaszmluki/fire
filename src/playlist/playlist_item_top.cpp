@@ -34,3 +34,7 @@ PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
 PlaylistItemTop::~PlaylistItemTop()
 {
 }
+
+void PlaylistItemTop::fetch()
+{
+}

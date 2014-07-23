@@ -15,6 +15,8 @@ class PlaylistItemTop : public PlaylistItem
 public:
     PlaylistItemTop(PlaylistDataModel *model);
     ~PlaylistItemTop();
+private:
+    void fetch();
 };
 
 #endif /* SRC_PLAYLIST_ITEM_TOP_H */

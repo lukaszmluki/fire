@@ -46,7 +46,7 @@ public:
     PlaylistItem(PlaylistItem *parent, PlaylistDataModel *model) :
         m_parentItem(parent),
         m_model(model),
-        m_fetchCalled(false)
+        m_fetched(false)
     {
     }
 
@@ -123,15 +123,20 @@ public:
         return m_itemData.m_name;
     }
 
-    virtual PlaylistItem *child(int row);
-    virtual int childCount();
+    PlaylistItem *child(int row)
+    {
+        return m_childItems.at(row);
+    }
 
-private slots:
-    void fetched(void *);
+    int childCount();
+
+    virtual void fetch() = 0;
+
+protected slots:
+    void addItem(PlaylistItem *item);
 
 protected:
-    virtual void fetch(QList<PlaylistItem *> &newData);
-    void asynchFetch();
+    static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
 
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
@@ -140,10 +145,8 @@ protected:
     QPersistentModelIndex m_modelIndex;
     QString m_url;
     PlaylistItemType m_itemType;
-
 private:
-    static void staticAsyncFetch(void *);
-    bool m_fetchCalled;
+    bool m_fetched;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_H */

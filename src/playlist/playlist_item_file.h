@@ -15,12 +15,8 @@ class PlaylistItemFile : public PlaylistItem
 public:
     PlaylistItemFile(PlaylistItem *parent, PlaylistDataModel *model);
     ~PlaylistItemFile();
-
-    PlaylistItem* child(int row);
-    int childCount();
 private:
-    static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
-    void fetch(QList<PlaylistItem *> &newData);
+    void fetch();
 };
 
 #endif /* SRC_PLAYLIST_ITEM_FILE_H */

@@ -20,3 +20,7 @@ void PlaylistItemCategory::addPlaylistItem(PlaylistItem *item)
 {
     m_childItems.push_back(item);
 }
+
+void PlaylistItemCategory::fetch()
+{
+}

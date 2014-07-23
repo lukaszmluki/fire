@@ -10,52 +10,32 @@
 #include "worker.h"
 #include <QDebug>
 
-class FetchData
+bool PlaylistItem::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 {
-public:
-    FetchData(PlaylistItem *_this) : m_this(_this) {}
-    PlaylistItem *m_this;
-    QList<PlaylistItem *> m_newItems;
-};
+    if (i1->haveChildren() != i2->haveChildren())
+        return i1->haveChildren();
+    return QString(i1->name()).compare(i2->name()) > 0;
+}
 
-void PlaylistItem::fetched(void *data)
+void PlaylistItem::addItem(PlaylistItem *item)
 {
-    FetchData *fetchData = static_cast<FetchData *>(data);
-    if (fetchData->m_newItems.count()) {
-        m_model->beginInsertRows(m_modelIndex, 0, fetchData->m_newItems.count() - 1);
-        m_childItems = fetchData->m_newItems;
-        m_model->endInsertRows();
+    //find position
+    int i = 0;
+    QList<PlaylistItem *>::iterator it = m_childItems.begin();
+    while (it != m_childItems.end() && !compare(*it, item)) {
+        ++it;
+        ++i;
     }
-    delete fetchData;
-}
-
-void PlaylistItem::staticAsyncFetch(void *data)
-{
-    FetchData *fetchData = static_cast<FetchData *>(data);
-    fetchData->m_this->fetch(fetchData->m_newItems);
-}
-
-void PlaylistItem::asynchFetch()
-{
-    if (m_fetchCalled)
-        return;
-    m_fetchCalled = true;
-    if (haveChildren())
-        Worker::shared().dispatch(staticAsyncFetch, new FetchData(this), this, SLOT(fetched(void *)));
-}
-
-void PlaylistItem::fetch(QList<PlaylistItem *> &newData)
-{
-    Q_UNUSED(newData)
-    Q_ASSERT(false);
-}
-
-PlaylistItem* PlaylistItem::child(int row)
-{
-    return m_childItems.at(row);
+    m_model->beginInsertRows(m_modelIndex, i, i);
+    m_childItems.insert(it, item);
+    m_model->endInsertRows();
 }
 
 int PlaylistItem::childCount()
 {
+    if (!m_fetched) {
+        m_fetched = true;
+        fetch();
+    }
     return m_childItems.count();
 }

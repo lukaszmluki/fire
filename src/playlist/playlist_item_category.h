@@ -17,6 +17,8 @@ class PlaylistItemCategory : public PlaylistItem
 public:
     PlaylistItemCategory(const QString &name, PlaylistItem *parent, PlaylistDataModel *model);
     void addPlaylistItem(PlaylistItem *item);
+private:
+    void fetch();
 };
 
 #endif /* SRC_PLAYLIST_ITEM_CATEGORY_H */
