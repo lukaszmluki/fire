@@ -3,7 +3,7 @@ TARGET = fire
 VERSION = 0.0.1
 
 CONFIG += debug
-QT += opengl core gui
+QT += opengl core gui network
 
 QMAKE_CXXFLAGS += -Werror -Wextra -std=c++11
 QMAKE_CXXFLAGS += -D__STDC_CONSTANT_MACROS=1
@@ -33,8 +33,9 @@ SOURCES += src/main.cpp \
            src/playlist/playlist_item_file.cpp \
            src/playlist/playlist_item_category.cpp \
            src/playlist/playlist_source.cpp \
+           src/window/playlist_source_add_window.cpp \
+           src/playlist/playlist_item_ftp.cpp \
            src/worker.cpp \
-    src/window/playlist_source_add_window.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -55,5 +56,6 @@ HEADERS += \
            src/playlist/playlist_item_file.h \
            src/playlist/playlist_item_category.h \
            src/playlist/playlist_source.h \
+           src/window/playlist_source_add_window.h \
+           src/playlist/playlist_item_ftp.h \
            src/worker.h \
-    src/window/playlist_source_add_window.h

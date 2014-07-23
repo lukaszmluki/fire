@@ -35,7 +35,8 @@ int PlaylistItem::childCount()
 {
     if (!m_fetched) {
         m_fetched = true;
-        fetch();
+        if (haveChildren())
+            fetch();
     }
     return m_childItems.count();
 }
