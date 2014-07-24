@@ -63,3 +63,8 @@ HEADERS += \
            src/window/playlist_source_add_window.h \
            src/playlist/playlist_item_ftp.h \
            src/worker.h \
+
+equals(HAVE_SMBCLIENT, "YES") {
+    SOURCES += src/playlist/playlist_item_samba.cpp
+    HEADERS +=src/playlist/playlist_item_samba.h
+}
