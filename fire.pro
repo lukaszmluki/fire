@@ -15,6 +15,10 @@ LIBS += -Lexternal/lib/ `PKG_CONFIG_PATH=./external/lib/pkgconfig pkg-config --l
 MOC_DIR = ./moc
 OBJECTS_DIR = ./obj
 
+HAVE_SMBCLIENT=NO
+
+unix:include(system_linux.pri)
+
 SOURCES += src/main.cpp \
 #           src/openglwindow.cpp \
            src/ffengine.cpp \
