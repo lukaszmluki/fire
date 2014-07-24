@@ -31,7 +31,7 @@ private slots:
     void customContextMenuRequest(const QPoint &point) const;
     void addShortcut();
     void addShortcutNamed();
-
+    void addNewSource();
 };
 
 #endif /* SRC_PLAYLIST_H */

@@ -23,7 +23,6 @@ void PlaylistItemFile::fetch()
 {
     QDir dir(m_url);
     PlaylistItem *item;
-    qDebug() << "listing... " << m_url;
     const QFileInfoList &list = dir.entryInfoList(QDir::Files  | QDir::Dirs   | QDir::NoDotDot | QDir::NoDot |
                                                   QDir::Drives | QDir::Hidden | QDir::System   | QDir::Readable,
                                                   QDir::NoSort);
@@ -36,4 +35,10 @@ void PlaylistItemFile::fetch()
         item->setItemType(entry.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
         addItem(item);
     }
+}
+
+bool PlaylistItemFile::validate() const
+{
+    //TODO
+    return true;
 }

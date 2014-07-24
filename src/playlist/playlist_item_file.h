@@ -17,6 +17,7 @@ public:
     ~PlaylistItemFile();
 private:
     void fetch();
+    bool validate() const;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_FILE_H */

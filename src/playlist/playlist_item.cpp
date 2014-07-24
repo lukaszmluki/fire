@@ -6,14 +6,36 @@
  */
 
 #include "playlist_item.h"
-#include "playlist_data_model.h"
-#include "worker.h"
 #include <QDebug>
+#include "playlist_data_model.h"
+#include "playlist_item_file.h"
+#include "playlist_item_ftp.h"
+#include "playlist_item_samba.h"
+
+PlaylistItem* PlaylistItem::fromUrl(const QString &url, PlaylistItem *parent, PlaylistDataModel *model)
+{
+    PlaylistItem *item = NULL;
+    if (url.startsWith("ftp://", Qt::CaseInsensitive)) {
+        item = new PlaylistItemFtp(parent, model);
+    } else if (url.startsWith("smb://", Qt::CaseInsensitive)) {
+#ifdef HAVE_SMBCLIENT
+        item = new PlaylistItemSamba(parent, model);
+#else
+        qWarning() << "Compiled without samba support.";
+#endif
+    } else {
+        item = new PlaylistItemFile(parent, model);
+    }
+    if (item)
+        item->setUrl(url);
+
+    return item;
+}
 
 bool PlaylistItem::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 {
     if (i1->haveChildren() != i2->haveChildren())
-        return i1->haveChildren();
+        return i2->haveChildren();
     return QString(i1->name()).compare(i2->name()) > 0;
 }
 

@@ -7,9 +7,6 @@
 
 #include "playlist_item_top.h"
 #include <QDebug>
-#include "playlist_item_file.h"
-#include "playlist_item_ftp.h"
-#include "playlist_item_samba.h"
 #include "playlist_item_category.h"
 #include "playlist_source.h"
 
@@ -24,20 +21,10 @@ PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
         newCategory = new PlaylistItemCategory(category.m_category, this, model);
         m_childItems.push_back(newCategory);
         Q_FOREACH(const PlaylistSourceDetail &source, category.m_sources) {
-            if (source.m_url.startsWith("ftp://", Qt::CaseInsensitive)) {
-                item = new PlaylistItemFtp(newCategory, model);
-            } else if (source.m_url.startsWith("smb://", Qt::CaseInsensitive)) {
-#ifdef HAVE_SMBCLIENT
-                item = new PlaylistItemSamba(newCategory, model);
-#else
-                qWarning() << "Compiled without samba support.";
+            item = PlaylistItem::fromUrl(source.m_url, newCategory, m_model);
+            if (!item)
                 continue;
-#endif
-            } else {
-                item = new PlaylistItemFile(newCategory, model);
-            }
             item->setName(source.m_name);
-            item->setUrl(source.m_url);
             item->setItemType(PLAYLIST_ITEM_DIRECTORY);
             newCategory->addPlaylistItem(item);
         }

@@ -34,6 +34,11 @@ void PlaylistView::addShortcut(const QString &url, const QString &name)
     dialog->deleteLater();
 }
 
+void PlaylistView::addNewSource()
+{
+    addShortcut(QString(), QString());
+}
+
 void PlaylistView::addShortcut()
 {
     QVariant data = dynamic_cast<QAction *>(sender())->data();
@@ -51,16 +56,21 @@ void PlaylistView::addShortcutNamed()
 void PlaylistView::showDirectoryContextMenu(const QModelIndex &index, const QPoint &point) const
 {
     PlaylistItem *item = static_cast<PlaylistItem *>(index.internalPointer());
+    QAction *a;
+    QMenu *contextMenu = new QMenu();
+
+    contextMenu->addAction("Add new source", this, SLOT(addNewSource()));
+
     if (item->parent()->itemType() != PlaylistItem::PLAYLIST_ITEM_CATEGORY) {
-        QAction *a;
-        QMenu *contextMenu = new QMenu();
+        contextMenu->addSeparator();
         a = contextMenu->addAction("Add as shortcut", this, SLOT(addShortcut()));
         a->setData(QVariant::fromValue(index.internalPointer()));
         a = contextMenu->addAction("Add as shortcut \"" + item->name() + "\"", this, SLOT(addShortcutNamed()));
         a->setData(QVariant::fromValue(index.internalPointer()));
-        contextMenu->exec(mapToGlobal(point) + QPoint(3, 3));
-        contextMenu->deleteLater();
     }
+
+    contextMenu->exec(mapToGlobal(point) + QPoint(3, 3));
+    contextMenu->deleteLater();
 }
 
 void PlaylistView::showFileContextMenu(const QModelIndex &index, const QPoint &point) const

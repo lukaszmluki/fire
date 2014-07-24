@@ -57,6 +57,8 @@ public:
         qDeleteAll(m_childItems);
     }
 
+    static PlaylistItem* fromUrl(const QString &url, PlaylistItem *parent, PlaylistDataModel *model);
+
     int columnCount() const
     {
         return m_itemData.columnCount();
@@ -131,6 +133,12 @@ public:
     }
 
     int childCount();
+
+    //TODO: make pure virtual
+    virtual bool validate() const
+    {
+        return true;
+    }
 
     virtual void fetch() = 0;
 
