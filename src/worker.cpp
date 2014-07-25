@@ -41,7 +41,7 @@ Worker::~Worker()
     delete m_worker;
 }
 
-Worker& Worker::shared()
+Worker& Worker::instance()
 {
     static Worker instance;
     return instance;

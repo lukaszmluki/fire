@@ -26,7 +26,7 @@ public:
 
     typedef void (*DispatchFunction)(void *);
 
-    static Worker& shared();
+    static Worker& instance();
 
     void dispatch(DispatchFunction f, void *data, QObject *receiver = NULL, const char *method = NULL);
 
