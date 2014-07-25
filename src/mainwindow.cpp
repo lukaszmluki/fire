@@ -32,6 +32,7 @@
 #include "playermanager.h"
 #include "ffengine.h"
 #include "playlist/playlist_view.h"
+#include "worker.h"
 
 void MainWindow::createCentralWidget()
 {
@@ -380,6 +381,13 @@ void MainWindow::moveEvent(QMoveEvent *e)
     QMainWindow::moveEvent(e);
     Preferences::instance().setValue("Window/window_geometry", saveGeometry());
     saveSplitterState(0, 0);
+}
+
+void MainWindow::closeEvent(QCloseEvent *e)
+{
+    //Make sure there is nothing happening in other threads
+    Worker::instance().teminate();
+    QMainWindow::closeEvent(e);
 }
 
 void MainWindow::showEditor()

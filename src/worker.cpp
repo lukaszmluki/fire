@@ -35,10 +35,7 @@ Worker::Worker()
 
 Worker::~Worker()
 {
-    m_thread->quit();
-    m_thread->wait();
-    delete m_thread;
-    delete m_worker;
+    Q_ASSERT(!m_thread && !m_worker);
 }
 
 Worker& Worker::instance()
@@ -56,4 +53,15 @@ void Worker::dispatch(DispatchFunction f, void *data, QObject *receiver, const c
         QObject::connect(worker, SIGNAL(finished(void *)), receiver, method, Qt::QueuedConnection);
     }
     QCoreApplication::postEvent(worker, new DispatchEvent(f, data));
+}
+
+void Worker::teminate()
+{
+    QCoreApplication::removePostedEvents(NULL, DispatchEvent::m_eventId);
+    m_thread->quit();
+    m_thread->wait();
+    delete m_thread;
+    delete m_worker;
+    m_thread = NULL;
+    m_worker = NULL;
 }

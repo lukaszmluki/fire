@@ -17,6 +17,7 @@ class SubtitlesEditor;
 
 class QResizeEvent;
 class QMoveEvent;
+class QCloseEvent;
 class QWidget;
 class QLabel;
 class QAction;
@@ -71,6 +72,7 @@ private slots:
 protected:
     void resizeEvent(QResizeEvent *e);
     void moveEvent(QMoveEvent *e);
+    void closeEvent(QCloseEvent *e);
 
 private:
     //GUI construction

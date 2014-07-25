@@ -29,6 +29,7 @@ public:
     static Worker& instance();
 
     void dispatch(DispatchFunction f, void *data, QObject *receiver = NULL, const char *method = NULL);
+    void teminate();
 
 private:
     QThread *m_thread;
