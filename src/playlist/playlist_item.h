@@ -48,6 +48,8 @@ public:
         m_model(model),
         m_fetched(false)
     {
+        static int init = qRegisterMetaType<PlaylistItem*>("PlaylistItem*");
+        Q_UNUSED(init)
     }
 
     virtual ~PlaylistItem()
