@@ -14,21 +14,7 @@ PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
     PlaylistItem(NULL, model)
 {
     setName("sources");
-    PlaylistItem *item;
-    QList<PlaylistSourceCategory> sources = PlaylistSource::instance().getSources();
-    Q_FOREACH(const PlaylistSourceCategory &category, sources) {
-        PlaylistItemCategory *newCategory;
-        newCategory = new PlaylistItemCategory(category.m_category, this, model);
-        m_childItems.push_back(newCategory);
-        Q_FOREACH(const PlaylistSourceDetail &source, category.m_sources) {
-            item = PlaylistItem::fromUrl(source.m_url, newCategory, m_model);
-            if (!item)
-                continue;
-            item->setName(source.m_name);
-            item->setItemType(PLAYLIST_ITEM_DIRECTORY);
-            newCategory->addPlaylistItem(item);
-        }
-    }
+    setItemType(PLAYLIST_ITEM_DIRECTORY);
 }
 
 PlaylistItemTop::~PlaylistItemTop()
@@ -37,4 +23,7 @@ PlaylistItemTop::~PlaylistItemTop()
 
 void PlaylistItemTop::fetch()
 {
+    QStringList categories = PlaylistSource::instance().categories();
+    Q_FOREACH(const QString &category, categories)
+        addItem(new PlaylistItemCategory(category, this, m_model));
 }

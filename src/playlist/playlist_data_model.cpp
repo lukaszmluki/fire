@@ -123,7 +123,7 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
 
 void PlaylistDataModel::beginInsertRows(const QModelIndex &parent, int first, int last)
 {
-    QAbstractItemModel::beginInsertRows(parent, first,last);
+    QAbstractItemModel::beginInsertRows(parent, first, last);
 }
 
 void PlaylistDataModel::endInsertRows()

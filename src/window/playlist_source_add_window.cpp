@@ -9,6 +9,7 @@
 #include <QUrl>
 #include <QMessageBox>
 #include "playlist/playlist_item.h"
+#include "playlist/playlist_source.h"
 
 enum class ProtocolType { FILE, FTP, SAMBA };
 
@@ -108,6 +109,10 @@ void PlaylistSourceAddWindow::add()
         QMessageBox::critical(this, tr("Invalid data"), tr("Provided data is invalid."));
         return;
     }
+    PlaylistSourceDetail detail;
+    detail.m_name = m_name->text();
+    detail.m_url = url();
+    PlaylistSource::instance().addNewSource(detail);
     accept();
 }
 

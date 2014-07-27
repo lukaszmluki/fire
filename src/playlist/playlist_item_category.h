@@ -14,9 +14,11 @@ class QString;
 
 class PlaylistItemCategory : public PlaylistItem
 {
+    Q_OBJECT
 public:
     PlaylistItemCategory(const QString &name, PlaylistItem *parent, PlaylistDataModel *model);
-    void addPlaylistItem(PlaylistItem *item);
+public slots:
+    void addPlaylistSource(const QString &category, const QString &name, const QString &url);
 private:
     void fetch();
 };

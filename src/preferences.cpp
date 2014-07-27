@@ -86,8 +86,8 @@ void Preferences::setValue(const QString &key, const QVariant &value, bool apply
 {
     m_settings->setValue(key, value);
     if (apply) {
-	m_defaultFontEditor.setFamily(getValue("editor/font_editor_family", "Arial").toString());
-	m_defaultFontEditor.setPointSize(getValue("editor/font_editor_size", 12).toInt());
+        m_defaultFontEditor.setFamily(getValue("editor/font_editor_family", "Arial").toString());
+        m_defaultFontEditor.setPointSize(getValue("editor/font_editor_size", 12).toInt());
         emit applySettings();
     }
 }

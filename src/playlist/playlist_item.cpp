@@ -28,7 +28,6 @@ PlaylistItem* PlaylistItem::fromUrl(const QString &url, PlaylistItem *parent, Pl
     }
     if (item)
         item->setUrl(url);
-
     return item;
 }
 
@@ -42,11 +41,14 @@ bool PlaylistItem::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 void PlaylistItem::addItem(PlaylistItem *item)
 {
     //find position
-    int i = 0;
     QList<PlaylistItem *>::iterator it = m_childItems.begin();
+    int i = 0;
+    if (it != m_childItems.end())
+        i = (*it)->m_modelIndex.row();
     while (it != m_childItems.end() && !compare(*it, item)) {
+        qDebug() << "skipping" << (*it)->m_modelIndex.row();
+        i = (*it)->m_modelIndex.row();
         ++it;
-        ++i;
     }
     m_model->beginInsertRows(m_modelIndex, i, i);
     m_childItems.insert(it, item);

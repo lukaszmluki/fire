@@ -38,14 +38,16 @@ class PlaylistItem : public QObject
 public:
 
     enum PlaylistItemType {
+        PLAYLIST_ITEM_UNKNOWN,
         PLAYLIST_ITEM_DIRECTORY,
         PLAYLIST_ITEM_FILE,
         PLAYLIST_ITEM_CATEGORY
     };
 
     PlaylistItem(PlaylistItem *parent, PlaylistDataModel *model) :
-        m_parentItem(parent),
+        m_itemType(PLAYLIST_ITEM_UNKNOWN),
         m_model(model),
+        m_parentItem(parent),
         m_fetched(false)
     {
         static int init = qRegisterMetaType<PlaylistItem*>("PlaylistItem*");
@@ -113,6 +115,7 @@ public:
 
     bool haveChildren() const
     {
+        Q_ASSERT(m_itemType != PLAYLIST_ITEM_UNKNOWN);
         return m_itemType == PLAYLIST_ITEM_DIRECTORY ||
                m_itemType == PLAYLIST_ITEM_CATEGORY;
     }
@@ -148,14 +151,14 @@ protected slots:
 protected:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
 
-    QList<PlaylistItem *> m_childItems;
-    PlaylistItemData m_itemData;
-    PlaylistItem *m_parentItem;
-    PlaylistDataModel *m_model;
-    QPersistentModelIndex m_modelIndex;
     QString m_url;
     PlaylistItemType m_itemType;
+    PlaylistDataModel *m_model;
 private:
+    QPersistentModelIndex m_modelIndex;
+    PlaylistItem *m_parentItem;
+    QList<PlaylistItem *> m_childItems;
+    PlaylistItemData m_itemData;
     bool m_fetched;
 };
 
