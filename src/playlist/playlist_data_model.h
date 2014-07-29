@@ -29,12 +29,13 @@ public:
     QModelIndex parent(const QModelIndex &index) const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    void beginInsertRows(const QModelIndex &parent, int first, int last);
-    void endInsertRows();
 
-    QString category(const QModelIndex &index) const;
+public slots:
+    void addPlaylistSource(const QString &category, const QString &name, const QString &url);
+    void addItem(PlaylistItem *parent, PlaylistItem *child);
 
 private:
+    QModelIndex findIndex(PlaylistItem *item) const;
     PlaylistItem *m_rootItem;
 };
 

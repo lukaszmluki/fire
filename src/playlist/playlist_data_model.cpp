@@ -8,13 +8,17 @@
 #include "playlist_data_model.h"
 #include <QDebug>
 #include <QIcon>
+#include <QQueue>
 #include "common.h"
 #include "playlist_item_top.h"
+#include "playlist_source.h"
 
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
     m_rootItem = new PlaylistItemTop(this);
+    connect(&PlaylistSource::instance(), SIGNAL(newSourceAdded(const QString&, const QString&, const QString&)),
+            this, SLOT(addPlaylistSource(const QString&, const QString&, const QString&)));
 }
 
 PlaylistDataModel::~PlaylistDataModel()
@@ -83,11 +87,8 @@ QModelIndex PlaylistDataModel::index(int row, int column, const QModelIndex &par
         parentItem = static_cast<PlaylistItem*>(parent.internalPointer());
 
     PlaylistItem *childItem = parentItem->child(row);
-    if (childItem) {
-        if (!childItem->modelIndex().isValid())
-            childItem->setModelIndex(createIndex(row, column, childItem));
-        return childItem->modelIndex();
-    }
+    if (childItem)
+        return createIndex(row, column, childItem);
     else
         return QModelIndex();
 }
@@ -121,23 +122,48 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
     return parentItem->childCount();
 }
 
-void PlaylistDataModel::beginInsertRows(const QModelIndex &parent, int first, int last)
+QModelIndex PlaylistDataModel::findIndex(PlaylistItem *item) const
 {
-    QAbstractItemModel::beginInsertRows(parent, first, last);
+    QQueue<QModelIndex> queue;
+    int i;
+    queue.enqueue(QModelIndex());
+    while (queue.count()) {
+        const QModelIndex &parent = queue.dequeue();
+        if (parent.internalPointer() == item)
+            return parent;
+        i = rowCount(parent);
+        for (int j = 0; j < i; ++j)
+            queue.enqueue(index(j, 0, parent));
+    }
+    return QModelIndex();
 }
 
-void PlaylistDataModel::endInsertRows()
+void PlaylistDataModel::addItem(PlaylistItem *parent, PlaylistItem *child)
 {
-    QAbstractItemModel::endInsertRows();
+    PlaylistItem *parentItem = parent ? parent : m_rootItem;
+    int position = parentItem->newChildPosition(child);
+    beginInsertRows(findIndex(parentItem), position, position);
+    parentItem->addItem(child, position);
+    endInsertRows();
 }
 
-QString PlaylistDataModel::category(const QModelIndex &index) const
+void PlaylistDataModel::addPlaylistSource(const QString &category, const QString &name, const QString &url)
 {
-    if (!index.isValid())
-        return QString();
+    PlaylistItem *parentItem = NULL;
+    for (int i = 0; i < m_rootItem->childCount(); ++i) {
+        parentItem = m_rootItem->child(i);
+        if (parentItem->name() == category)
+            break;
+    }
+    if (!parentItem) {
+        qCritical() << "Category" << category << "not found.";
+        return;
+    }
 
-    const PlaylistItem *item = static_cast<PlaylistItem*>(index.internalPointer());
-    while (item->itemType() != PlaylistItem::PLAYLIST_ITEM_CATEGORY)
-        item = item->parent();
-    return item->name();
+    PlaylistItem *item = PlaylistItem::fromUrl(url, parentItem, this);
+    if (item) {
+        item->setName(name);
+        item->setItemType(PlaylistItem::PLAYLIST_ITEM_DIRECTORY);
+        addItem(parentItem, item);
+    }
 }

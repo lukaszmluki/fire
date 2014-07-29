@@ -38,21 +38,20 @@ bool PlaylistItem::compare(const PlaylistItem *i1, const PlaylistItem *i2)
     return QString(i1->name()).compare(i2->name()) > 0;
 }
 
-void PlaylistItem::addItem(PlaylistItem *item)
+void PlaylistItem::addItem(PlaylistItem *item, int position)
 {
-    //find position
-    QList<PlaylistItem *>::iterator it = m_childItems.begin();
+    m_childItems.insert(position, item);
+}
+
+int PlaylistItem::newChildPosition(const PlaylistItem *child) const
+{
+    QList<PlaylistItem *>::const_iterator it = m_childItems.begin();
     int i = 0;
-    if (it != m_childItems.end())
-        i = (*it)->m_modelIndex.row();
-    while (it != m_childItems.end() && !compare(*it, item)) {
-        qDebug() << "skipping" << (*it)->m_modelIndex.row();
-        i = (*it)->m_modelIndex.row();
+    while (it != m_childItems.end() && !compare(*it, child)) {
+        ++i;
         ++it;
     }
-    m_model->beginInsertRows(m_modelIndex, i, i);
-    m_childItems.insert(it, item);
-    m_model->endInsertRows();
+    return i;
 }
 
 int PlaylistItem::childCount()

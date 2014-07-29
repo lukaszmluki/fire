@@ -17,8 +17,6 @@ class PlaylistItemCategory : public PlaylistItem
     Q_OBJECT
 public:
     PlaylistItemCategory(const QString &name, PlaylistItem *parent, PlaylistDataModel *model);
-public slots:
-    void addPlaylistSource(const QString &category, const QString &name, const QString &url);
 private:
     void fetch();
 };

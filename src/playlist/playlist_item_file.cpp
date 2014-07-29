@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QDir>
 #include "common.h"
+#include "playlist_data_model.h"
 
 PlaylistItemFile::PlaylistItemFile(PlaylistItem *parent, PlaylistDataModel *model) :
     PlaylistItem(parent, model)
@@ -29,11 +30,11 @@ void PlaylistItemFile::fetch()
     Q_FOREACH(const QFileInfo &entry, list) {
         if (!entry.isDir() && !Utils::movieExtentions().contains(entry.suffix(), Qt::CaseInsensitive))
             continue;
-        item = new PlaylistItemFile(static_cast<PlaylistItem *>(this), m_model);
+        item = new PlaylistItemFile(this, m_model);
         item->setName(entry.fileName());
         item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + entry.fileName());
         item->setItemType(entry.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
-        addItem(item);
+        m_model->addItem(this, item);
     }
 }
 

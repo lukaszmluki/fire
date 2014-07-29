@@ -45,9 +45,9 @@ public:
     };
 
     PlaylistItem(PlaylistItem *parent, PlaylistDataModel *model) :
-        m_itemType(PLAYLIST_ITEM_UNKNOWN),
         m_model(model),
         m_parentItem(parent),
+        m_itemType(PLAYLIST_ITEM_UNKNOWN),
         m_fetched(false)
     {
         static int init = qRegisterMetaType<PlaylistItem*>("PlaylistItem*");
@@ -81,16 +81,6 @@ public:
         if (m_parentItem)
             return m_parentItem->m_childItems.indexOf(const_cast<PlaylistItem *>(this));
         return 0;
-    }
-
-    void setModelIndex(const QModelIndex &modelIndex)
-    {
-        m_modelIndex = modelIndex;
-    }
-
-    QPersistentModelIndex modelIndex() const
-    {
-        return m_modelIndex;
     }
 
     void setUrl(const QString url)
@@ -143,20 +133,21 @@ public:
         return true;
     }
 
+    //TODO: does it need to be virtual?
+    int newChildPosition(const PlaylistItem *child) const;
+
     virtual void fetch() = 0;
 
-protected slots:
-    void addItem(PlaylistItem *item);
+    void addItem(PlaylistItem *item, int position);
 
 protected:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
 
     QString m_url;
-    PlaylistItemType m_itemType;
     PlaylistDataModel *m_model;
-private:
-    QPersistentModelIndex m_modelIndex;
     PlaylistItem *m_parentItem;
+private:
+    PlaylistItemType m_itemType;
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
     bool m_fetched;

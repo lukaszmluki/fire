@@ -9,6 +9,7 @@
 #include <QDebug>
 #include "playlist_item_category.h"
 #include "playlist_source.h"
+#include "playlist_data_model.h"
 
 PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
     PlaylistItem(NULL, model)
@@ -25,5 +26,5 @@ void PlaylistItemTop::fetch()
 {
     QStringList categories = PlaylistSource::instance().categories();
     Q_FOREACH(const QString &category, categories)
-        addItem(new PlaylistItemCategory(category, this, m_model));
+        m_model->addItem(m_parentItem, new PlaylistItemCategory(category, this, m_model));
 }

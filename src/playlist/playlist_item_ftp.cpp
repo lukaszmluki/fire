@@ -53,7 +53,7 @@ void PlaylistItemFtp::listInfo(const QUrlInfo &i)
     item->setName(utf8Name);
     item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + utf8Name);
     item->setItemType(i.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
-    addItem(item);
+    //addItem(item);
 }
 
 void PlaylistItemFtp::fetch()
