@@ -17,26 +17,56 @@
 class PlaylistSourceDetail
 {
 public:
-    PlaylistSourceDetail()
+    PlaylistSourceDetail() :
+        m_fixed(false)
     {
     }
 
     PlaylistSourceDetail(const PlaylistSourceDetail &other) :
         m_name(other.m_name),
-        m_url(other.m_url)
+        m_url(other.m_url),
+        m_fixed(other.m_fixed)
     {
     }
 
-    PlaylistSourceDetail(const QString &name, const QString &url) :
+    PlaylistSourceDetail(const QString &name, const QString &url, bool fixed = false) :
         m_name(name),
-        m_url(url)
+        m_url(url),
+        m_fixed(fixed)
     {
     }
 
     bool isNetwork() const;
 
+    void setName(const QString &name)
+    {
+        m_name = name;
+    }
+
+    QString name() const
+    {
+        return m_name;
+    }
+
+    void setUrl(const QString url)
+    {
+        m_url = url;
+    }
+
+    QString url() const
+    {
+        return m_url;
+    }
+
+    bool fixed() const
+    {
+        return m_fixed;
+    }
+
+private:
     QString m_name;
     QString m_url;
+    bool m_fixed;
 };
 Q_DECLARE_METATYPE(PlaylistSourceDetail)
 QDataStream &operator<<(QDataStream &out, const PlaylistSourceDetail &obj);
@@ -56,7 +86,7 @@ public:
     void addNewSource(const PlaylistSourceDetail &source);
 
 signals:
-    void newSourceAdded(const QString &category, const QString &name, const QString &url);
+    void newSourceAdded(const QString &category, const PlaylistSourceDetail &);
 
 private:
     static QList<QVariant> convertSources(const QList<PlaylistSourceDetail> &sources);

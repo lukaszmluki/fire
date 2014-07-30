@@ -17,8 +17,8 @@ PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
 {
     m_rootItem = new PlaylistItemTop(this);
-    connect(&PlaylistSource::instance(), SIGNAL(newSourceAdded(const QString&, const QString&, const QString&)),
-            this, SLOT(addPlaylistSource(const QString&, const QString&, const QString&)));
+    connect(&PlaylistSource::instance(), SIGNAL(newSourceAdded(const QString&, const PlaylistSourceDetail &)),
+            this, SLOT(addPlaylistSource(const QString&, const PlaylistSourceDetail &)));
 }
 
 PlaylistDataModel::~PlaylistDataModel()
@@ -147,7 +147,7 @@ void PlaylistDataModel::addItem(PlaylistItem *parent, PlaylistItem *child)
     endInsertRows();
 }
 
-void PlaylistDataModel::addPlaylistSource(const QString &category, const QString &name, const QString &url)
+void PlaylistDataModel::addPlaylistSource(const QString &category, const PlaylistSourceDetail &source)
 {
     PlaylistItem *parentItem = NULL;
     for (int i = 0; i < m_rootItem->childCount(); ++i) {
@@ -160,9 +160,10 @@ void PlaylistDataModel::addPlaylistSource(const QString &category, const QString
         return;
     }
 
-    PlaylistItem *item = PlaylistItem::fromUrl(url, parentItem, this);
+    PlaylistItem *item = PlaylistItem::fromUrl(source.url(), parentItem, this);
     if (item) {
-        item->setName(name);
+        item->setName(source.name());
+        item->setFixed(source.fixed());
         item->setItemType(PlaylistItem::PLAYLIST_ITEM_DIRECTORY);
         addItem(parentItem, item);
     }

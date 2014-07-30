@@ -33,14 +33,11 @@ PlaylistItem* PlaylistItem::fromUrl(const QString &url, PlaylistItem *parent, Pl
 
 bool PlaylistItem::compare(const PlaylistItem *i1, const PlaylistItem *i2)
 {
+    if (i1->fixed() != i2->fixed())
+        return i2->fixed();
     if (i1->haveChildren() != i2->haveChildren())
         return i2->haveChildren();
     return QString(i1->name()).compare(i2->name()) > 0;
-}
-
-void PlaylistItem::addItem(PlaylistItem *item, int position)
-{
-    m_childItems.insert(position, item);
 }
 
 int PlaylistItem::newChildPosition(const PlaylistItem *child) const

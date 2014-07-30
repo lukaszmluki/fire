@@ -46,7 +46,8 @@ public:
 
     PlaylistItem(PlaylistItem *parent, PlaylistDataModel *model) :
         m_model(model),
-        m_parentItem(parent),
+        m_parent(parent),
+        m_fixed(false),
         m_itemType(PLAYLIST_ITEM_UNKNOWN),
         m_fetched(false)
     {
@@ -68,7 +69,30 @@ public:
 
     PlaylistItem *parent() const
     {
-        return m_parentItem;
+        return m_parent;
+    }
+
+    PlaylistItem *child(int row)
+    {
+        return m_childItems.at(row);
+    }
+
+    int childCount();
+
+    //TODO: does it need to be virtual?
+    int newChildPosition(const PlaylistItem *child) const;
+
+    virtual void fetch() = 0;
+
+    void addItem(PlaylistItem *item, int position)
+    {
+        m_childItems.insert(position, item);
+    }
+
+    //TODO: make pure virtual
+    virtual bool validate() const
+    {
+        return true;
     }
 
     QVariant columnData(int column) const
@@ -78,8 +102,8 @@ public:
 
     int row() const
     {
-        if (m_parentItem)
-            return m_parentItem->m_childItems.indexOf(const_cast<PlaylistItem *>(this));
+        if (m_parent)
+            return m_parent->m_childItems.indexOf(const_cast<PlaylistItem *>(this));
         return 0;
     }
 
@@ -120,37 +144,33 @@ public:
         return m_itemData.m_name;
     }
 
-    PlaylistItem *child(int row)
+    void setFixed(bool fixed)
     {
-        return m_childItems.at(row);
+        m_fixed = fixed;
     }
 
-    int childCount();
-
-    //TODO: make pure virtual
-    virtual bool validate() const
+    bool fixed() const
     {
-        return true;
+        return m_fixed;
     }
 
-    //TODO: does it need to be virtual?
-    int newChildPosition(const PlaylistItem *child) const;
-
-    virtual void fetch() = 0;
-
-    void addItem(PlaylistItem *item, int position);
+    PlaylistItem* parent()
+    {
+        return m_parent;
+    }
 
 protected:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
-
-    QString m_url;
     PlaylistDataModel *m_model;
-    PlaylistItem *m_parentItem;
+
 private:
+    PlaylistItem *m_parent;
+    bool m_fixed;
+    QString m_url;
     PlaylistItemType m_itemType;
+    bool m_fetched;
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
-    bool m_fetched;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_H */

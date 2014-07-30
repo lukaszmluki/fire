@@ -10,6 +10,7 @@
 
 #include <QObject>
 #include <QAbstractItemModel>
+#include "playlist_source.h"
 
 class PlaylistItem;
 
@@ -31,7 +32,7 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
 public slots:
-    void addPlaylistSource(const QString &category, const QString &name, const QString &url);
+    void addPlaylistSource(const QString &category, const PlaylistSourceDetail &source);
     void addItem(PlaylistItem *parent, PlaylistItem *child);
 
 private:

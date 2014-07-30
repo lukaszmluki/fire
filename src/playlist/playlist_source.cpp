@@ -24,8 +24,8 @@ bool PlaylistSourceDetail::isNetwork() const
 
 QDataStream &operator<<(QDataStream &out, const PlaylistSourceDetail &obj)
 {
-    out << obj.m_name.toUtf8().constData();
-    out << obj.m_url.toUtf8().constData();
+    out << obj.name().toUtf8().constData();
+    out << obj.url().toUtf8().constData();
     return out;
 }
 
@@ -33,10 +33,10 @@ QDataStream &operator>>(QDataStream &in, PlaylistSourceDetail &obj)
 {
     char *tmp;
     in >> tmp;
-    obj.m_name = QString::fromUtf8(tmp);
+    obj.setName(QString::fromUtf8(tmp));
     delete[] tmp;
     in >> tmp;
-    obj.m_url = QString::fromUtf8(tmp);
+    obj.setUrl(QString::fromUtf8(tmp));
     delete[] tmp;
     return in;
 }
@@ -75,8 +75,8 @@ PlaylistSource& PlaylistSource::instance()
 QList<PlaylistSourceDetail> PlaylistSource::platformSpecificSources() const
 {
     QList<PlaylistSourceDetail> sources;
-    sources << PlaylistSourceDetail(tr("Home"), QDir::homePath())
-            << PlaylistSourceDetail(tr("System"), "/");
+    sources << PlaylistSourceDetail(tr("Home"), QDir::homePath(), true)
+            << PlaylistSourceDetail(tr("System"), "/", true);
     return sources;
 }
 #else
@@ -115,10 +115,10 @@ void PlaylistSource::addNewSource(const PlaylistSourceDetail &source)
 {
     if (source.isNetwork()) {
         m_network << source;
-        emit newSourceAdded(CATEGORY_NETWORK, source.m_name, source.m_url);
+        emit newSourceAdded(CATEGORY_NETWORK, source);
     } else {
         m_computer << source;
-        emit newSourceAdded(CATEGORY_COMPUTER, source.m_name, source.m_url);
+        emit newSourceAdded(CATEGORY_COMPUTER, source);
     }
     QList<PlaylistSourceDetail> user = userSources();
     user << source;

@@ -2,6 +2,7 @@
 #include <QDebug>
 #include <QUrl>
 #include "common.h"
+#include "playlist_data_model.h"
 
 PlaylistItemFtp::PlaylistItemFtp(PlaylistItem *parent, PlaylistDataModel *model) :
     PlaylistItem(parent, model),
@@ -33,7 +34,7 @@ void PlaylistItemFtp::done(bool error)
 void PlaylistItemFtp::rawCommandReply(int code, const QString &detail)
 {
     if (code == 257) {
-        QUrl url(m_url);
+        QUrl url(PlaylistItem::url());
         QString path = detail.mid(1, detail.indexOf("\"", 1) - 1);
         path.append('/').append(url.path());
         m_ftp->list(path);
@@ -42,6 +43,7 @@ void PlaylistItemFtp::rawCommandReply(int code, const QString &detail)
 
 void PlaylistItemFtp::listInfo(const QUrlInfo &i)
 {
+    const QString &url = PlaylistItem::url();
     QString utf8Name = QString::fromUtf8(i.name().toStdString().c_str());
     QString ext;
     int pos = utf8Name.lastIndexOf(".");
@@ -51,14 +53,14 @@ void PlaylistItemFtp::listInfo(const QUrlInfo &i)
         return;
     PlaylistItemFtp *item = new PlaylistItemFtp(static_cast<PlaylistItem *>(this), m_model);
     item->setName(utf8Name);
-    item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + utf8Name);
+    item->setUrl(url + (url.endsWith("/") ? "" : "/") + utf8Name);
     item->setItemType(i.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
-    //addItem(item);
+    m_model->addItem(this, item);
 }
 
 void PlaylistItemFtp::fetch()
 {
-    QUrl url(m_url);
+    QUrl url(PlaylistItem::url());
     m_ftp->connectToHost(url.host(), url.port());
     m_ftp->login(url.userName(), url.password());
     m_ftp->rawCommand("PWD");

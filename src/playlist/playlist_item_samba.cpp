@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QMetaObject>
 #include "worker.h"
+#include "playlist_data_model.h"
 
 void PlaylistItemSamba::auth(SMBCCTX *c, const char *server, const char *share,
                              char *workgroup, int workgroupLength,
@@ -57,7 +58,8 @@ void PlaylistItemSamba::privateFetch()
         struct smbc_dirent *entry;
         int dh;
         PlaylistItem *item;
-        if ((dh = smbc_opendir(m_url.toUtf8().constData())) < 0) {
+        const QString &url = PlaylistItem::url();
+        if ((dh = smbc_opendir(url.toUtf8().constData())) < 0) {
             qCritical() << "Cannot open directory:" << strerror(errno);
             return;
         }
@@ -68,10 +70,10 @@ void PlaylistItemSamba::privateFetch()
                 continue;
             item = new PlaylistItemSamba(static_cast<PlaylistItem *>(this), m_model);
             item->setName(QString::fromUtf8(entry->name));
-            item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + item->name());
+            item->setUrl(url + (url.endsWith("/") ? "" : "/") + item->name());
             item->setItemType(entry->smbc_type == SMBC_DIR ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
-            QMetaObject::invokeMethod(this, "addItem", Qt::QueuedConnection,
-                                      QGenericReturnArgument(), Q_ARG(PlaylistItem *, item));
+            QMetaObject::invokeMethod(m_model, "addItem", Qt::QueuedConnection, QGenericReturnArgument(),
+                                      Q_ARG(PlaylistItem *, this), Q_ARG(PlaylistItem *, item));
 
         } while (true);
     }

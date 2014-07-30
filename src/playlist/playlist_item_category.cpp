@@ -21,6 +21,6 @@ void PlaylistItemCategory::fetch()
 {
     QList<PlaylistSourceDetail> sources = PlaylistSource::instance().sources(name());
     Q_FOREACH(const PlaylistSourceDetail &source, sources) {
-        m_model->addPlaylistSource(name(), source.m_name, source.m_url);
+        m_model->addPlaylistSource(name(), source);
     }
 }

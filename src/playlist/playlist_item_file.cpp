@@ -22,7 +22,8 @@ PlaylistItemFile::~PlaylistItemFile()
 
 void PlaylistItemFile::fetch()
 {
-    QDir dir(m_url);
+    const QString &url = PlaylistItem::url();
+    QDir dir(url);
     PlaylistItem *item;
     const QFileInfoList &list = dir.entryInfoList(QDir::Files  | QDir::Dirs   | QDir::NoDotDot | QDir::NoDot |
                                                   QDir::Drives | QDir::Hidden | QDir::System   | QDir::Readable,
@@ -32,7 +33,7 @@ void PlaylistItemFile::fetch()
             continue;
         item = new PlaylistItemFile(this, m_model);
         item->setName(entry.fileName());
-        item->setUrl(m_url + (m_url.endsWith("/") ? "" : "/") + entry.fileName());
+        item->setUrl(url + (url.endsWith("/") ? "" : "/") + entry.fileName());
         item->setItemType(entry.isDir() ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
         m_model->addItem(this, item);
     }
