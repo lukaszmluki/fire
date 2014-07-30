@@ -114,6 +114,7 @@ QList<PlaylistSourceDetail> PlaylistSource::userSources() const
 void PlaylistSource::addNewSource(const PlaylistSourceDetail &source)
 {
     if (source.isNetwork()) {
+        qDebug() << "added network source";
         m_network << source;
         emit newSourceAdded(CATEGORY_NETWORK, source);
     } else {

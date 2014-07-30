@@ -7,6 +7,7 @@
 
 #include "playlist_item_category.h"
 #include <QString>
+#include <QDebug>
 #include "playlist_source.h"
 #include "playlist_data_model.h"
 

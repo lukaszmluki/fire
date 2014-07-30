@@ -25,6 +25,7 @@ PlaylistItemTop::~PlaylistItemTop()
 void PlaylistItemTop::fetch()
 {
     QStringList categories = PlaylistSource::instance().categories();
-    Q_FOREACH(const QString &category, categories)
-        m_model->addItem(parent(), new PlaylistItemCategory(category, this, m_model));
+    Q_FOREACH(const QString &category, categories) {
+        m_model->addItem(this, new PlaylistItemCategory(category, this, m_model));
+    }
 }

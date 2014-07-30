@@ -12,6 +12,7 @@
 #include "common.h"
 #include "playlist_item_top.h"
 #include "playlist_source.h"
+#include "playlist_item_category.h"
 
 PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     QAbstractItemModel(parent)
@@ -124,6 +125,8 @@ int PlaylistDataModel::rowCount(const QModelIndex &parent) const
 
 QModelIndex PlaylistDataModel::findIndex(PlaylistItem *item) const
 {
+    if (item == m_rootItem)
+        return QModelIndex();
     QQueue<QModelIndex> queue;
     int i;
     queue.enqueue(QModelIndex());
@@ -140,25 +143,30 @@ QModelIndex PlaylistDataModel::findIndex(PlaylistItem *item) const
 
 void PlaylistDataModel::addItem(PlaylistItem *parent, PlaylistItem *child)
 {
-    PlaylistItem *parentItem = parent ? parent : m_rootItem;
-    int position = parentItem->newChildPosition(child);
-    beginInsertRows(findIndex(parentItem), position, position);
-    parentItem->addItem(child, position);
+    int position = parent->newChildPosition(child);
+    beginInsertRows(findIndex(parent), position, position);
+    parent->addItem(child, position);
     endInsertRows();
 }
 
 void PlaylistDataModel::addPlaylistSource(const QString &category, const PlaylistSourceDetail &source)
 {
     PlaylistItem *parentItem = NULL;
+    qDebug() << m_rootItem->childCount();
     for (int i = 0; i < m_rootItem->childCount(); ++i) {
-        parentItem = m_rootItem->child(i);
-        if (parentItem->name() == category)
+        PlaylistItem *item = m_rootItem->child(i);
+        qDebug() << item->name();
+        if (item->name() == category) {
+            parentItem = item;
             break;
+        }
     }
     if (!parentItem) {
-        qCritical() << "Category" << category << "not found.";
-        return;
+        qDebug() << "Category" << category << "not found. Adding.";
+        parentItem = new PlaylistItemCategory(category, m_rootItem, this);
+        addItem(m_rootItem, parentItem);
     }
+    qDebug() << "adding to" << parentItem->name() << "wanted" << category ;
 
     PlaylistItem *item = PlaylistItem::fromUrl(source.url(), parentItem, this);
     if (item) {

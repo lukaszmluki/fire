@@ -50,6 +50,7 @@ void PlaylistSourceAddWindow::createUI()
     addTextField(m_passwordLabel, m_password, tr("Password"));
     m_password->setEchoMode(QLineEdit::Password);
     addTextField(m_portLabel, m_port, tr("Port"));
+    m_port->setValidator(new QIntValidator(1, 65535, this));
     addTextField(m_pathLabel, m_path, tr("Path"));
 
     layout->addSpacing(6);
@@ -79,6 +80,21 @@ PlaylistSourceAddWindow::~PlaylistSourceAddWindow()
 {
 }
 
+QString PlaylistSourceAddWindow::selectedScheme() const
+{
+    switch(static_cast<ProtocolType>(m_protocol->itemData(m_protocol->currentIndex()).toInt())) {
+    case ProtocolType::FILE:
+        return "file";
+    case ProtocolType::FTP:
+        return "ftp";
+    case ProtocolType::SAMBA:
+        return "smb";
+    default:
+        break;
+    }
+    return QString();
+}
+
 QString PlaylistSourceAddWindow::url() const
 {
     if (!isFullUrl())
@@ -88,7 +104,9 @@ QString PlaylistSourceAddWindow::url() const
     url.setPath(m_path->text());
     url.setPassword(m_password->text());
     url.setUserName(m_username->text());
-    url.setPort(m_port->text().toInt());
+    if (m_port->text().length())
+        url.setPort(m_port->text().toInt());
+    url.setScheme(selectedScheme());
     qDebug() << url.toString();
     return url.toString();
 }

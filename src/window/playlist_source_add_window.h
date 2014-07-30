@@ -24,6 +24,7 @@ private slots:
 private:
     bool validate();
     QString url() const;
+    QString selectedScheme() const;
     bool isFullUrl() const;
 
     QComboBox *m_protocol;
