@@ -40,6 +40,7 @@ SOURCES += src/main.cpp \
            src/window/playlist_source_add_window.cpp \
            src/playlist/playlist_item_ftp.cpp \
            src/worker.cpp \
+           src/taskqueue.cpp
 
 HEADERS += \
 #           src/openglwindow.h \
@@ -63,6 +64,7 @@ HEADERS += \
            src/window/playlist_source_add_window.h \
            src/playlist/playlist_item_ftp.h \
            src/worker.h \
+           src/taskqueue.h
 
 equals(HAVE_SMBCLIENT, "YES") {
     SOURCES += src/playlist/playlist_item_samba.cpp
