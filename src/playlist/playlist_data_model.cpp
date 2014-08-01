@@ -129,14 +129,23 @@ QModelIndex PlaylistDataModel::findIndex(PlaylistItem *item) const
         return QModelIndex();
     QQueue<QModelIndex> queue;
     int i;
+    PlaylistItem *localitem;
     queue.enqueue(QModelIndex());
     while (queue.count()) {
         const QModelIndex &parent = queue.dequeue();
         if (parent.internalPointer() == item)
             return parent;
         i = rowCount(parent);
-        for (int j = 0; j < i; ++j)
-            queue.enqueue(index(j, 0, parent));
+        for (int j = 0; j < i; ++j) {
+            QModelIndex ix = index(j, 0, parent);
+            localitem = static_cast<PlaylistItem*>(ix.internalPointer());
+            if (localitem->itemType() == PlaylistItem::PLAYLIST_ITEM_FILE ||
+                (localitem->itemType() == PlaylistItem::PLAYLIST_ITEM_DIRECTORY &&
+                 !item->url().startsWith(localitem->url()))) {
+                continue;
+            }
+            queue.enqueue(ix);
+        }
     }
     return QModelIndex();
 }
@@ -166,7 +175,6 @@ void PlaylistDataModel::addPlaylistSource(const QString &category, const Playlis
         parentItem = new PlaylistItemCategory(category, m_rootItem, this);
         addItem(m_rootItem, parentItem);
     }
-    qDebug() << "adding to" << parentItem->name() << "wanted" << category ;
 
     PlaylistItem *item = PlaylistItem::fromUrl(source.url(), parentItem, this);
     if (item) {

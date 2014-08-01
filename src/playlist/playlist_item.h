@@ -39,6 +39,7 @@ public:
 
     enum PlaylistItemType {
         PLAYLIST_ITEM_UNKNOWN,
+        PLAYLIST_ITEM_ROOT,
         PLAYLIST_ITEM_DIRECTORY,
         PLAYLIST_ITEM_FILE,
         PLAYLIST_ITEM_CATEGORY
@@ -131,7 +132,8 @@ public:
     {
         Q_ASSERT(m_itemType != PLAYLIST_ITEM_UNKNOWN);
         return m_itemType == PLAYLIST_ITEM_DIRECTORY ||
-               m_itemType == PLAYLIST_ITEM_CATEGORY;
+               m_itemType == PLAYLIST_ITEM_CATEGORY ||
+               m_itemType == PLAYLIST_ITEM_ROOT;
     }
 
     void setName(const QString &name)

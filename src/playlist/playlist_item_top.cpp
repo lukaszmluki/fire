@@ -15,7 +15,7 @@ PlaylistItemTop::PlaylistItemTop(PlaylistDataModel *model) :
     PlaylistItem(NULL, model)
 {
     setName("sources");
-    setItemType(PLAYLIST_ITEM_DIRECTORY);
+    setItemType(PLAYLIST_ITEM_ROOT);
 }
 
 PlaylistItemTop::~PlaylistItemTop()

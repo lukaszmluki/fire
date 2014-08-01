@@ -21,13 +21,13 @@ PlaylistItemFtp::~PlaylistItemFtp()
 void PlaylistItemFtp::stateChanged(int state)
 {
     Q_UNUSED(state)
-    qDebug() << "state" << state;
+    //qDebug() << "state" << state;
 }
 
 void PlaylistItemFtp::done(bool error)
 {
     Q_UNUSED(error)
-    qDebug() << "done" << error;
+    //qDebug() << "done" << error;
     disconnect(m_connection->m_ftp, 0, this, 0);
     m_connectionPool.prepend(m_connection);
     m_connection = NULL;
