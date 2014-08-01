@@ -5,6 +5,8 @@
 #include <QQueue>
 #include <QThread>
 
+class QEvent;
+
 class TaskQueue : public QObject
 {
     Q_OBJECT
@@ -17,10 +19,9 @@ public:
     void addTask(QObject *obj, const char *member, QGenericReturnArgument ret,
                  QGenericArgument val0 = QGenericArgument(0), QGenericArgument val1 = QGenericArgument());
 
-signals:
+    bool next();
 
-public slots:
-    void performTask();
+    bool event(QEvent *e);
 
 private:
     struct Task
