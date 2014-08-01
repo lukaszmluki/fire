@@ -69,9 +69,20 @@ void PlaylistItemSamba::privateFetch()
             if (!strcmp(entry->name, ".") || !strcmp(entry->name, ".."))
                 continue;
             item = new PlaylistItemSamba(static_cast<PlaylistItem *>(this), m_model);
+            switch (entry->smbc_type) {
+            case SMBC_DIR:
+            case SMBC_FILE_SHARE:
+                item->setItemType(PLAYLIST_ITEM_DIRECTORY);
+                break;
+            case SMBC_FILE:
+                item->setItemType(PLAYLIST_ITEM_FILE);
+                break;
+            default:
+                delete item;
+                continue;
+            }
             item->setName(QString::fromUtf8(entry->name));
             item->setUrl(url + (url.endsWith("/") ? "" : "/") + item->name());
-            item->setItemType(entry->smbc_type == SMBC_DIR ? PLAYLIST_ITEM_DIRECTORY : PLAYLIST_ITEM_FILE);
             QMetaObject::invokeMethod(m_model, "addItem", Qt::QueuedConnection, QGenericReturnArgument(),
                                       Q_ARG(PlaylistItem *, this), Q_ARG(PlaylistItem *, item));
 
