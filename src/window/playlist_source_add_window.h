@@ -11,9 +11,17 @@ class QLabel;
 class PlaylistSourceAddWindow : public QDialog
 {
     Q_OBJECT
-public:
-    explicit PlaylistSourceAddWindow(const QString &name, const QString &url = QString(), QWidget *parent = 0);
+    explicit PlaylistSourceAddWindow(const QString &name,
+                                     const QString &url = QString(),
+                                     const QString &sourceGuid = QString(),
+                                     QWidget *parent = 0);
     ~PlaylistSourceAddWindow();
+public:
+
+    static void show(const QString &name,
+                     const QString &url = QString(),
+                     const QString &sourceGuid = QString(),
+                     QWidget *parent = 0);
 
 signals:
 
@@ -25,6 +33,7 @@ private:
     bool validate();
     QString url() const;
     QString selectedScheme() const;
+    void selectScheme(const QString &scheme);
     bool isFullUrl() const;
 
     QComboBox *m_protocol;
@@ -40,6 +49,7 @@ private:
     QLabel *m_portLabel;
     QLineEdit *m_path;
     QLabel *m_pathLabel;
+    QString m_sourceGuid;
     void createUI();
 };
 

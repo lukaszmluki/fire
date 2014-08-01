@@ -35,6 +35,7 @@ public:
 class PlaylistItem : public QObject
 {
     Q_OBJECT
+    Q_DISABLE_COPY(PlaylistItem)
 public:
 
     enum PlaylistItemType {
@@ -88,6 +89,11 @@ public:
     void addItem(PlaylistItem *item, int position)
     {
         m_childItems.insert(position, item);
+    }
+
+    void removeItem(PlaylistItem *item)
+    {
+        m_childItems.removeAll(item);
     }
 
     //TODO: make pure virtual
@@ -161,6 +167,16 @@ public:
         return m_parent;
     }
 
+    QString sourceGuid() const
+    {
+        return m_sourceGuid;
+    }
+
+    void setSourceGuid(const QString guid)
+    {
+        m_sourceGuid = guid;
+    }
+
 protected:
     static bool compare(const PlaylistItem *i1, const PlaylistItem *i2);
     PlaylistDataModel *m_model;
@@ -173,6 +189,7 @@ private:
     bool m_fetched;
     QList<PlaylistItem *> m_childItems;
     PlaylistItemData m_itemData;
+    QString m_sourceGuid;
 };
 
 #endif /* SRC_PLAYLIST_ITEM_H */

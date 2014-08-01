@@ -24,8 +24,10 @@ bool PlaylistSourceDetail::isNetwork() const
 
 QDataStream &operator<<(QDataStream &out, const PlaylistSourceDetail &obj)
 {
-    out << obj.name().toUtf8().constData();
-    out << obj.url().toUtf8().constData();
+    out << obj.m_name.toUtf8().constData();
+    out << obj.m_url.toUtf8().constData();
+    out << obj.m_fixed;
+    out << obj.m_guid;
     return out;
 }
 
@@ -38,6 +40,8 @@ QDataStream &operator>>(QDataStream &in, PlaylistSourceDetail &obj)
     in >> tmp;
     obj.setUrl(QString::fromUtf8(tmp));
     delete[] tmp;
+    in >> obj.m_fixed;
+    in >> obj.m_guid;
     return in;
 }
 
@@ -114,7 +118,6 @@ QList<PlaylistSourceDetail> PlaylistSource::userSources() const
 void PlaylistSource::addNewSource(const PlaylistSourceDetail &source)
 {
     if (source.isNetwork()) {
-        qDebug() << "added network source";
         m_network << source;
         emit newSourceAdded(CATEGORY_NETWORK, source);
     } else {
@@ -126,10 +129,36 @@ void PlaylistSource::addNewSource(const PlaylistSourceDetail &source)
     Preferences::instance().setValue("Playlist/sources", convertSources(user));
 }
 
+void PlaylistSource::updateSource(const PlaylistSourceDetail &source, const QString &guid)
+{
+    removeSource(guid);
+    addNewSource(source);
+}
+
+void PlaylistSource::removeSource(const QString &guid)
+{
+    auto remove = [&guid](QList<PlaylistSourceDetail> &list)
+    {
+        auto it = list.begin();
+        for (; it != list.end(); ++it) {
+            if (it->guid() == guid) {
+                list.erase(it);
+                break;
+            }
+        }
+    };
+    QList<PlaylistSourceDetail> user = userSources();
+    remove(user);
+    remove(m_network);
+    remove(m_computer);
+    Preferences::instance().setValue("Playlist/sources", convertSources(user));
+    emit sourceRemoved(guid);
+}
+
 QStringList PlaylistSource::categories() const
 {
     QStringList categories(CATEGORY_COMPUTER);
-    if (m_network.count())
+    //if (m_network.count())
         categories << CATEGORY_NETWORK;
     return categories;
 }

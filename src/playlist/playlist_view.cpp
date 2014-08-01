@@ -12,6 +12,7 @@
 #include <QModelIndex>
 #include "playlist_data_model.h"
 #include "playlist_item.h"
+#include "playlist_source.h"
 #include "window/playlist_source_add_window.h"
 
 PlaylistView::PlaylistView(QWidget *parent) :
@@ -29,9 +30,7 @@ PlaylistView::PlaylistView(QWidget *parent) :
 
 void PlaylistView::addShortcut(const QString &url, const QString &name)
 {
-    PlaylistSourceAddWindow *dialog = new PlaylistSourceAddWindow(name, url, this);
-    dialog->exec();
-    dialog->deleteLater();
+    PlaylistSourceAddWindow::show(name, url, QString(), this);
 }
 
 void PlaylistView::addNewSource()
@@ -53,6 +52,20 @@ void PlaylistView::addShortcutNamed()
     addShortcut(item->url(), item->name());
 }
 
+void PlaylistView::editShortcut()
+{
+    QVariant data = dynamic_cast<QAction *>(sender())->data();
+    const PlaylistItem *item = static_cast<PlaylistItem *>(data.value<void*>());
+    PlaylistSourceAddWindow::show(item->name(), item->url(), item->sourceGuid(), this);
+}
+
+void PlaylistView::removeShortcut()
+{
+    QVariant data = dynamic_cast<QAction *>(sender())->data();
+    const PlaylistItem *item = static_cast<PlaylistItem *>(data.value<void*>());
+    PlaylistSource::instance().removeSource(item->sourceGuid());
+}
+
 void PlaylistView::showDirectoryContextMenu(const QModelIndex &index, const QPoint &point) const
 {
     PlaylistItem *item = static_cast<PlaylistItem *>(index.internalPointer());
@@ -60,6 +73,13 @@ void PlaylistView::showDirectoryContextMenu(const QModelIndex &index, const QPoi
     QMenu *contextMenu = new QMenu();
 
     contextMenu->addAction("Add new source", this, SLOT(addNewSource()));
+
+    if (item->parent()->itemType() == PlaylistItem::PLAYLIST_ITEM_CATEGORY && !item->fixed()) {
+        a = contextMenu->addAction("Remove shortcut \"" + item->name() + "\"", this, SLOT(removeShortcut()));
+        a->setData(QVariant::fromValue(index.internalPointer()));
+        a = contextMenu->addAction("Edit shortcut \"" + item->name() + "\"", this, SLOT(editShortcut()));
+        a->setData(QVariant::fromValue(index.internalPointer()));
+    }
 
     if (item->parent()->itemType() != PlaylistItem::PLAYLIST_ITEM_CATEGORY) {
         contextMenu->addSeparator();

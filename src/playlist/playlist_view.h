@@ -32,6 +32,8 @@ private slots:
     void addShortcut();
     void addShortcutNamed();
     void addNewSource();
+    void removeShortcut();
+    void editShortcut();
 };
 
 #endif /* SRC_PLAYLIST_H */

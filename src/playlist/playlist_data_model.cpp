@@ -20,6 +20,8 @@ PlaylistDataModel::PlaylistDataModel(QObject *parent) :
     m_rootItem = new PlaylistItemTop(this);
     connect(&PlaylistSource::instance(), SIGNAL(newSourceAdded(const QString&, const PlaylistSourceDetail &)),
             this, SLOT(addPlaylistSource(const QString&, const PlaylistSourceDetail &)));
+    connect(&PlaylistSource::instance(), SIGNAL(sourceRemoved(const QString &)),
+            this, SLOT(removeSource(const QString &)));
 }
 
 PlaylistDataModel::~PlaylistDataModel()
@@ -67,9 +69,7 @@ Qt::ItemFlags PlaylistDataModel::flags(const QModelIndex &index) const
 
 QVariant PlaylistDataModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_UNUSED(section);
     Q_UNUSED(orientation);
-    Q_UNUSED(role);
     if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
        return m_rootItem->columnData(section);
     return QVariant();
@@ -150,6 +150,25 @@ QModelIndex PlaylistDataModel::findIndex(PlaylistItem *item) const
     return QModelIndex();
 }
 
+void PlaylistDataModel::removeSource(const QString &guid)
+{
+    int catCnt = m_rootItem->childCount();
+    PlaylistItem *category, *source;
+    for (int c = 0; c < catCnt; c++) {
+        category = m_rootItem->child(c);
+        int iCnt = category->childCount();
+        for (int i = 0; i < iCnt; i++) {
+            source = category->child(i);
+            if (source->sourceGuid() == guid) {
+                beginRemoveRows(findIndex(category), i, i);
+                category->removeItem(source);
+                endRemoveRows();
+                return;
+            }
+        }
+    }
+}
+
 void PlaylistDataModel::addItem(PlaylistItem *parent, PlaylistItem *child)
 {
     int position = parent->newChildPosition(child);
@@ -161,23 +180,24 @@ void PlaylistDataModel::addItem(PlaylistItem *parent, PlaylistItem *child)
 void PlaylistDataModel::addPlaylistSource(const QString &category, const PlaylistSourceDetail &source)
 {
     PlaylistItem *parentItem = NULL;
-    qDebug() << m_rootItem->childCount();
     for (int i = 0; i < m_rootItem->childCount(); ++i) {
         PlaylistItem *item = m_rootItem->child(i);
-        qDebug() << item->name();
         if (item->name() == category) {
             parentItem = item;
             break;
         }
     }
     if (!parentItem) {
-        qDebug() << "Category" << category << "not found. Adding.";
-        parentItem = new PlaylistItemCategory(category, m_rootItem, this);
-        addItem(m_rootItem, parentItem);
+        qDebug() << "Category" << category << "not found.";
+        return;
+        //qDebug() << "Category" << category << "not found. Adding.";
+        //parentItem = new PlaylistItemCategory(category, m_rootItem, this);
+        //addItem(m_rootItem, parentItem);
     }
 
     PlaylistItem *item = PlaylistItem::fromUrl(source.url(), parentItem, this);
     if (item) {
+        item->setSourceGuid(source.guid());
         item->setName(source.name());
         item->setFixed(source.fixed());
         item->setItemType(PlaylistItem::PLAYLIST_ITEM_DIRECTORY);

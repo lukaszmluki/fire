@@ -13,26 +13,30 @@
 #include <QObject>
 #include <QMetaType>
 #include <QStringList>
+#include <QUuid>
 
 class PlaylistSourceDetail
 {
 public:
     PlaylistSourceDetail() :
-        m_fixed(false)
+        m_fixed(false),
+        m_guid(QUuid::createUuid().toString())
     {
     }
 
     PlaylistSourceDetail(const PlaylistSourceDetail &other) :
         m_name(other.m_name),
         m_url(other.m_url),
-        m_fixed(other.m_fixed)
+        m_fixed(other.m_fixed),
+        m_guid(other.m_guid)
     {
     }
 
     PlaylistSourceDetail(const QString &name, const QString &url, bool fixed = false) :
         m_name(name),
         m_url(url),
-        m_fixed(fixed)
+        m_fixed(fixed),
+        m_guid(QUuid::createUuid().toString())
     {
     }
 
@@ -63,10 +67,19 @@ public:
         return m_fixed;
     }
 
+    QString guid() const
+    {
+        return m_guid;
+    }
+
 private:
     QString m_name;
     QString m_url;
     bool m_fixed;
+    QString m_guid;
+
+friend QDataStream &operator<<(QDataStream &out, const PlaylistSourceDetail &obj);
+friend QDataStream &operator>>(QDataStream &in, PlaylistSourceDetail &obj);
 };
 Q_DECLARE_METATYPE(PlaylistSourceDetail)
 QDataStream &operator<<(QDataStream &out, const PlaylistSourceDetail &obj);
@@ -84,9 +97,12 @@ public:
     QList<PlaylistSourceDetail> sources(const QString &category) const;
 
     void addNewSource(const PlaylistSourceDetail &source);
+    void updateSource(const PlaylistSourceDetail &source, const QString &guid);
+    void removeSource(const QString &guid);
 
 signals:
     void newSourceAdded(const QString &category, const PlaylistSourceDetail &);
+    void sourceRemoved(const QString &guid);
 
 private:
     static QList<QVariant> convertSources(const QList<PlaylistSourceDetail> &sources);

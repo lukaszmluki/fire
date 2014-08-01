@@ -34,6 +34,7 @@ public:
 public slots:
     void addPlaylistSource(const QString &category, const PlaylistSourceDetail &source);
     void addItem(PlaylistItem *parent, PlaylistItem *child);
+    void removeSource(const QString &guid);
 
 private:
     QModelIndex findIndex(PlaylistItem *item) const;

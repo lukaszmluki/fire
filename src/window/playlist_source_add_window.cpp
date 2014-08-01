@@ -64,20 +64,35 @@ void PlaylistSourceAddWindow::createUI()
     protocolIndexChanged(m_protocol->currentIndex());
 }
 
-PlaylistSourceAddWindow::PlaylistSourceAddWindow(const QString &name, const QString &url, QWidget *parent) :
-    QDialog(parent)
+PlaylistSourceAddWindow::PlaylistSourceAddWindow(const QString &name, const QString &url, const QString &sourceGuid, QWidget *parent) :
+    QDialog(parent),
+    m_sourceGuid(sourceGuid)
 {
     createUI();
     if (!name.isNull())
         m_name->setText(name);
     if (!url.isNull()) {
-        m_path->setText(url);
+        QUrl lurl(url);
+        selectScheme(lurl.scheme());
         m_protocol->setDisabled(true);
+        m_path->setText(lurl.path());
+        if (lurl.port() > 0)
+            m_port->setText(QString::number(lurl.port()));
+        m_host->setText(lurl.host());
+        m_username->setText(lurl.userName());
+        m_password->setText(lurl.password());
     }
 }
 
 PlaylistSourceAddWindow::~PlaylistSourceAddWindow()
 {
+}
+
+void PlaylistSourceAddWindow::show(const QString &name, const QString &url, const QString &sourceGuid, QWidget *parent)
+{
+    PlaylistSourceAddWindow *dialog = new PlaylistSourceAddWindow(name, url, sourceGuid, parent);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 QString PlaylistSourceAddWindow::selectedScheme() const
@@ -95,6 +110,23 @@ QString PlaylistSourceAddWindow::selectedScheme() const
     return QString();
 }
 
+void PlaylistSourceAddWindow::selectScheme(const QString &scheme)
+{
+    ProtocolType protocol = ProtocolType::FILE;
+    if (!scheme.compare("ftp", Qt::CaseInsensitive))
+        protocol = ProtocolType::FTP;
+    else if (!scheme.compare("smb", Qt::CaseInsensitive))
+        protocol = ProtocolType::SAMBA;
+    int cnt = m_protocol->count();
+    for (int i = 0; i < cnt; ++i) {
+        if (static_cast<ProtocolType>(m_protocol->itemData(i).toInt()) == protocol) {
+            m_protocol->setCurrentIndex(i);
+            return;
+        }
+    }
+    m_protocol->setCurrentIndex(0);
+}
+
 QString PlaylistSourceAddWindow::url() const
 {
     if (!isFullUrl())
@@ -107,7 +139,6 @@ QString PlaylistSourceAddWindow::url() const
     if (m_port->text().length())
         url.setPort(m_port->text().toInt());
     url.setScheme(selectedScheme());
-    qDebug() << url.toString();
     return url.toString();
 }
 
@@ -127,7 +158,10 @@ void PlaylistSourceAddWindow::add()
         QMessageBox::critical(this, tr("Invalid data"), tr("Provided data is invalid."));
         return;
     }
-    PlaylistSource::instance().addNewSource(PlaylistSourceDetail(m_name->text(), url()));
+    if (!m_sourceGuid.isNull())
+        PlaylistSource::instance().updateSource(PlaylistSourceDetail(m_name->text(), url()), m_sourceGuid);
+    else
+        PlaylistSource::instance().addNewSource(PlaylistSourceDetail(m_name->text(), url()));
     accept();
 }
 
