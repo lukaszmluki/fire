@@ -25,10 +25,10 @@ void PlaylistItemFtp::stateChanged(int state)
 
 void PlaylistItemFtp::done(bool error)
 {
-    Q_UNUSED(error)
     //qDebug() << "done" << error;
     disconnect(m_connection->m_ftp, 0, this, 0);
-    m_connectionPool.prepend(m_connection);
+    if (!error)
+        m_connectionPool.prepend(m_connection);
     m_connection.clear();
     m_task.next();
 }
