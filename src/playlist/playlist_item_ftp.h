@@ -2,6 +2,7 @@
 #define SRC_PLAYLIST_PLAYLIST_ITEM_FTP_H
 
 #include <QList>
+#include <QFtp>
 #include "playlist_item.h"
 #include "taskqueue.h"
 
@@ -25,16 +26,21 @@ private:
 
     struct Connection
     {
+        ~Connection()
+        {
+            m_ftp->deleteLater();
+        }
+
         QFtp *m_ftp;
         QString m_host;
         QString m_username;
         int m_port;
         QString m_path;
     };
-    Connection *m_connection;
+    QSharedPointer<Connection> m_connection;
 
     static TaskQueue m_task;
-    static QList<Connection *> m_connectionPool;
+    static QList<QSharedPointer<Connection>> m_connectionPool;
 
 };
 

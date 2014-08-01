@@ -1,12 +1,11 @@
 #include "playlist_item_ftp.h"
 #include <QDebug>
 #include <QUrl>
-#include <QFtp>
 #include "common.h"
 #include "playlist_data_model.h"
 
 TaskQueue PlaylistItemFtp::m_task(false);
-QList<PlaylistItemFtp::Connection *> PlaylistItemFtp::m_connectionPool;
+QList<QSharedPointer<PlaylistItemFtp::Connection>> PlaylistItemFtp::m_connectionPool;
 
 PlaylistItemFtp::PlaylistItemFtp(PlaylistItem *parent, PlaylistDataModel *model) :
     PlaylistItem(parent, model),
@@ -30,7 +29,7 @@ void PlaylistItemFtp::done(bool error)
     //qDebug() << "done" << error;
     disconnect(m_connection->m_ftp, 0, this, 0);
     m_connectionPool.prepend(m_connection);
-    m_connection = NULL;
+    m_connection.clear();
     m_task.next();
 }
 
@@ -44,6 +43,10 @@ void PlaylistItemFtp::fetchTask()
             (*it)->m_port == url.port() &&
             (*it)->m_username == url.userName())
         {
+            if ((*it)->m_ftp->state() != QFtp::LoggedIn) {
+                it = m_connectionPool.erase(it);
+                continue;
+            }
             m_connection = *it;
             m_connectionPool.erase(it);
             connect(m_connection->m_ftp, SIGNAL(listInfo(const QUrlInfo &)), this, SLOT(listInfo(const QUrlInfo &)));
@@ -55,7 +58,7 @@ void PlaylistItemFtp::fetchTask()
     }
 
     if (!m_connection) {
-        m_connection = new Connection();
+        m_connection = QSharedPointer<Connection>(new Connection());
         m_connection->m_ftp = new QFtp();
         m_connection->m_host = url.host();
         m_connection->m_port = url.port();
@@ -80,10 +83,11 @@ void PlaylistItemFtp::rawCommandReply(int code, const QString &detail)
         m_connection->m_path = detail.mid(1, detail.indexOf("\"", 1) - 1);
         QString tmp = m_connection->m_path;
         m_connection->m_ftp->list(tmp.append('/').append(url.path()));
+    } else {
+        qWarning() << "Cannot stat remore directory";
+        m_connection.clear();
+        m_task.next();
     }
-//    TODO:
-//    else
-//        m_connection->m_ftp->close();
 }
 
 void PlaylistItemFtp::listInfo(const QUrlInfo &i)
